@@ -2,7 +2,7 @@ Getting started
 ======
 
 Check out the project and run the default target of the build.xml.
-A dist folder will be created there you find the JAR File.
+A dist folder will be created where you will find the JAR File.
 
 ## Usage 
 
