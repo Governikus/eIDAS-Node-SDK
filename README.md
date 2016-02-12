@@ -81,9 +81,13 @@ private static void ParseResponse(byte[] incomingSAMLResponse) throws Configurat
 try(ByteArrayInputStream is = new ByteArrayInputStream(incomingSAMLResponse)){
                     
                     try {
+                    
+                        java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate)Utils.readCert(NewReceiverServlet.class.getResourceAsStream("saml-sign.pem.crt"),
+    	                "x509");
+                    
                            EidasResponse eidasResponse = EidasSaml.ParseResponse(is, 
                                         new Utils.X509KeyPair[]{keyPair}, //decrypter
-                                        new X509Certificate[]{keyPair.getCert()} //signature authors
+                                        new X509Certificate[]{cert} //signature authors
                            );
                            
                            //get and progress the requested values
