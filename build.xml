@@ -95,8 +95,8 @@
     </target>
 	
 	
-	<target depends="build" name="create-starerkit" description="creates the eidas starterkit jar">
-		    <jar destfile="dist/eidas-starterkit.jar"  basedir="build/classes" 
+	<target depends="build" name="create-starerkit" description="creates the eidas eidas-node-sdk jar">
+		    <jar destfile="dist/eidas-node-sdk.jar"  basedir="build/classes" 
 		    	includes="eidassaml/**">	
 		    </jar>
 	    </target> 
