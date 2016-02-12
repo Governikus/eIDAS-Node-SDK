@@ -32,6 +32,9 @@ public static void setUp() throws ConfigurationException {
 
 /*
 Now let us create a MetaXML:
+This sample shows how to create a meta.xml for a eidas middleware service. if you want to create a xml for a eidas-connector
+use EidasSaml.CreateMetaDataNode(...);
+If you have to parse a metadata.xml use EidasSaml.ParseMetaDataNode() or EidasSaml.ParseMetaDataService()
 */
        private static void CreateMetaData() throws CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
              EidasOrganisation organization = new EidasOrganisation("Gov", "Gov AG", "http://localhost", "de-de");
