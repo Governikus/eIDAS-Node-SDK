@@ -17,7 +17,7 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit;
+package eidassaml.starterkit;
 
 import java.util.ResourceBundle;
 
@@ -204,7 +204,7 @@ public enum ErrorCode
 
   private final String samlStatus;
 
-  private static ResourceBundle messages = ResourceBundle.getBundle("de.governikus.eidassaml.starterkit.errorcodes");
+  private static ResourceBundle messages = ResourceBundle.getBundle("eidassaml.starterkit.errorcodes");
 
   /**
    * Return human-readable text describing this code.

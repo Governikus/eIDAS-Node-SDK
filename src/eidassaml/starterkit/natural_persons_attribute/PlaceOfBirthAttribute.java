@@ -17,11 +17,11 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit.natural_persons_attribute;
+package eidassaml.starterkit.natural_persons_attribute;
 
-import de.governikus.eidassaml.starterkit.EidasAttribute;
-import de.governikus.eidassaml.starterkit.EidasNaturalPersonAttributes;
-import de.governikus.eidassaml.starterkit.template.TemplateLoader;
+import eidassaml.starterkit.EidasAttribute;
+import eidassaml.starterkit.EidasNaturalPersonAttributes;
+import eidassaml.starterkit.template.TemplateLoader;
 
 public class PlaceOfBirthAttribute implements EidasAttribute{
 	

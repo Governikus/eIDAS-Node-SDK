@@ -17,7 +17,7 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit.template;
+package eidassaml.starterkit.template;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.governikus.eidassaml.starterkit.Constants;
+import eidassaml.starterkit.Constants;
 
 public class TemplateLoader {
 	

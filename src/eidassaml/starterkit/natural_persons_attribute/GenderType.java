@@ -17,7 +17,7 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit.natural_persons_attribute;
+package eidassaml.starterkit.natural_persons_attribute;
 
 
 

@@ -17,7 +17,7 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit;
+package eidassaml.starterkit;
 
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;

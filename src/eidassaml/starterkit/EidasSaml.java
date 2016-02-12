@@ -17,7 +17,7 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit;
+package eidassaml.starterkit;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,8 +52,8 @@ import org.opensaml.xml.validation.ValidationException;
 import org.opensaml.xml.validation.ValidatorSuite;
 import org.xml.sax.SAXException;
 
-import de.governikus.eidassaml.starterkit.Utils.X509KeyPair;
-import de.governikus.eidassaml.starterkit.template.TemplateLoader;
+import eidassaml.starterkit.Utils.X509KeyPair;
+import eidassaml.starterkit.template.TemplateLoader;
 
 /**
  * Put all method together for creating, validating and parsing of saml messages and make it easy.

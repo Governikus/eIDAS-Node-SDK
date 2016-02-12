@@ -17,7 +17,7 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit;
+package eidassaml.starterkit;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -74,12 +74,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import de.governikus.eidassaml.starterkit.Constants;
-import de.governikus.eidassaml.starterkit.EidasNaturalPersonAttributes;
-import de.governikus.eidassaml.starterkit.EidasSigner;
-import de.governikus.eidassaml.starterkit.Utils;
-import de.governikus.eidassaml.starterkit.XMLSignatureHandler;
-import de.governikus.eidassaml.starterkit.template.TemplateLoader;
+import eidassaml.starterkit.Constants;
+import eidassaml.starterkit.EidasNaturalPersonAttributes;
+import eidassaml.starterkit.EidasSigner;
+import eidassaml.starterkit.Utils;
+import eidassaml.starterkit.XMLSignatureHandler;
+import eidassaml.starterkit.template.TemplateLoader;
 
 /**
  * 

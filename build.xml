@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="build" name="eu-middleware">
+<project basedir="." default="create-starerkit" name="eu-middleware">
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
@@ -52,14 +52,7 @@
         <path refid="servletlibclasspath"/>
         <path refid="applibclasspath"/>
     </path>
-	
-	<path id="eu-middleware-test.classpath">
-	        <pathelement location="build/classes"/>
-	        <path refid="servletlibclasspath"/>
-		    <path refid="testlibclasspath"/>
-	        <path refid="applibclasspath"/>
-	    </path>
-	
+		
     <target depends="clean" name="init">
         <copy includeemptydirs="false" todir="build/classes">
             <fileset dir="src">
@@ -101,45 +94,13 @@
         </javac>
     </target>
 	
-	<target depends="init-test" name="build-test-project">
-	        <echo message="${ant.project.name}: ${ant.file}"/>
-	        <javac debug="true" debuglevel="${debuglevel}" destdir="build/classes" includeantruntime="false" source="${source}" target="${target}">
-	            <src path="src"/>
-	        	<src path="test"/>
-	            <classpath refid="eu-middleware-test.classpath"/>
-	        </javac>
-	    </target>
-    
-    <target depends="build" name="create-war" description="creates a web application archive file">
-	    <war destfile="dist/eu-middleware.war" needxmlfile="false" >	
-		    <classes dir="build/classes"/>
-		    <lib dir="lib_ext/saml"/>
-		    <!-- <fileset dir="WebContent"/> -->
-	    </war>
-    </target> 
 	
 	<target depends="build" name="create-starerkit" description="creates the eidas starterkit jar">
 		    <jar destfile="dist/eidas-starterkit.jar"  basedir="build/classes" 
-		    	includes="de/governikus/eidassaml/**"
-		    	excludes="de/governikus/eu_middleware/**">	
+		    	includes="eidassaml/**">	
 		    </jar>
 	    </target> 
 	
-	<target depends="build-test-project" name="run-test" description="run the eidas test">
-		<junit printsummary="yes" haltonfailure="false">
 
-			<classpath refid="eu-middleware-test.classpath" />
-
-		    <test name="de.governikus.eu_middleware.test.EidasRoundTrip"
-		             haltonfailure="no" outfile="result">
-
-		      <formatter type="plain"/>
-		      <formatter type="xml"/>
-
-		    </test>
-
-		  </junit>
-			    
-    </target> 
               	
 </project>

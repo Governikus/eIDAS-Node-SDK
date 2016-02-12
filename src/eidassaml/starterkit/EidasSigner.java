@@ -17,12 +17,12 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit;
+package eidassaml.starterkit;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import de.governikus.eidassaml.starterkit.XMLSignatureHandler.SigEntryType;
+import eidassaml.starterkit.XMLSignatureHandler.SigEntryType;
 
 /**
  * 

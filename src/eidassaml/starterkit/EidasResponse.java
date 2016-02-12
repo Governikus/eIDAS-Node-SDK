@@ -17,7 +17,7 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit;
+package eidassaml.starterkit;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -71,22 +71,22 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import de.governikus.eidassaml.starterkit.Constants;
-import de.governikus.eidassaml.starterkit.EidasEncrypter;
-import de.governikus.eidassaml.starterkit.EidasSigner;
-import de.governikus.eidassaml.starterkit.ErrorCode;
-import de.governikus.eidassaml.starterkit.ErrorCodeException;
-import de.governikus.eidassaml.starterkit.Utils;
-import de.governikus.eidassaml.starterkit.XMLSignatureHandler;
-import de.governikus.eidassaml.starterkit.natural_persons_attribute.AbstractNameAttribute;
-import de.governikus.eidassaml.starterkit.natural_persons_attribute.BirthNameAttribute;
-import de.governikus.eidassaml.starterkit.natural_persons_attribute.CurrentAddressAttribute;
-import de.governikus.eidassaml.starterkit.natural_persons_attribute.DateOfBirthAttribute;
-import de.governikus.eidassaml.starterkit.natural_persons_attribute.FamilyNameAttribute;
-import de.governikus.eidassaml.starterkit.natural_persons_attribute.GivenNameAttribute;
-import de.governikus.eidassaml.starterkit.natural_persons_attribute.PersonIdentifyerAttribute;
-import de.governikus.eidassaml.starterkit.natural_persons_attribute.PlaceOfBirthAttribute;
-import de.governikus.eidassaml.starterkit.template.TemplateLoader;
+import eidassaml.starterkit.Constants;
+import eidassaml.starterkit.EidasEncrypter;
+import eidassaml.starterkit.EidasSigner;
+import eidassaml.starterkit.ErrorCode;
+import eidassaml.starterkit.ErrorCodeException;
+import eidassaml.starterkit.Utils;
+import eidassaml.starterkit.XMLSignatureHandler;
+import eidassaml.starterkit.natural_persons_attribute.AbstractNameAttribute;
+import eidassaml.starterkit.natural_persons_attribute.BirthNameAttribute;
+import eidassaml.starterkit.natural_persons_attribute.CurrentAddressAttribute;
+import eidassaml.starterkit.natural_persons_attribute.DateOfBirthAttribute;
+import eidassaml.starterkit.natural_persons_attribute.FamilyNameAttribute;
+import eidassaml.starterkit.natural_persons_attribute.GivenNameAttribute;
+import eidassaml.starterkit.natural_persons_attribute.PersonIdentifyerAttribute;
+import eidassaml.starterkit.natural_persons_attribute.PlaceOfBirthAttribute;
+import eidassaml.starterkit.template.TemplateLoader;
 
 /**
  * 

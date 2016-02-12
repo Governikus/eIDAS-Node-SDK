@@ -17,7 +17,7 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package de.governikus.eidassaml.starterkit;
+package eidassaml.starterkit;
 
 public enum EidasNameIdType {
 	Persistent("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"),
