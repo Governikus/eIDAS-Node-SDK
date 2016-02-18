@@ -17,7 +17,7 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package eidassaml.starterkit.natural_persons_attribute;
+package eidassaml.starterkit.person_attributes.natural_persons_attribute;
 
 
 
@@ -36,15 +36,15 @@ public enum GenderType {
 	
 	public static GenderType GetValueOf(String s)
 	{
-		if(Male.NAME.equals(s)){
+		if(Male.NAME.equalsIgnoreCase(s.trim())){
 			return Male;
 		}
 				
-		if(Female.NAME.equals(s)){
+		if(Female.NAME.equalsIgnoreCase(s.trim())){
 			return Female;
 		}
 		
-		if(Unspecified.NAME.equals(s)){
+		if(Unspecified.NAME.equalsIgnoreCase(s.trim())){
 			return Unspecified;
 		}
 		

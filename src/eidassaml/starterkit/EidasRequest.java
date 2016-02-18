@@ -54,6 +54,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import org.opensaml.Configuration;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.saml2.core.impl.AuthnRequestMarshaller;
@@ -103,7 +104,7 @@ public class EidasRequest {
 	
 	private EidasSigner signer = null;
 	private AuthnRequest request = null;
-	private Map<EidasNaturalPersonAttributes, Boolean> requestedAttributes = new HashMap<EidasNaturalPersonAttributes, Boolean>();
+	private Map<EidasPersonAttributes, Boolean> requestedAttributes = new HashMap<>();
 	
 	private EidasRequest(){
 		
@@ -130,13 +131,13 @@ public class EidasRequest {
 		issueInstant = SimpleDf.format(new Date());
 	}
 	
-	public byte[] generate(Map<EidasNaturalPersonAttributes, Boolean> _requestedAttributes) throws IOException, XMLParserException, UnmarshallingException, CertificateEncodingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
+	public byte[] generate(Map<EidasPersonAttributes, Boolean> _requestedAttributes) throws IOException, XMLParserException, UnmarshallingException, CertificateEncodingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
 	{
 		byte[] returnvalue = null;
 		StringBuilder attributesBuilder = new StringBuilder();
-		for (Map.Entry<EidasNaturalPersonAttributes, Boolean> entry : _requestedAttributes
+		for (Map.Entry<EidasPersonAttributes, Boolean> entry : _requestedAttributes
 				.entrySet()) {
-			attributesBuilder.append(attributeTemplate.replace("$NAME", entry.getKey().NAME).replace("$ISREQ", entry.getValue().toString()));
+			attributesBuilder.append(attributeTemplate.replace("$NAME", entry.getKey().getName()).replace("$ISREQ", entry.getValue().toString()));
 		}
 		
 		String template = TemplateLoader.GetTemplateByName("auth");
@@ -198,7 +199,7 @@ public class EidasRequest {
 		return issueInstant;
 	}
 
-	public Set<Entry<EidasNaturalPersonAttributes, Boolean>> getRequestedAttributes() {
+	public Set<Entry<EidasPersonAttributes, Boolean>> getRequestedAttributes() {
 		return requestedAttributes.entrySet();
 	}
 	
@@ -289,8 +290,12 @@ public class EidasRequest {
 				for ( XMLObject attribute : extension.getOrderedChildren() )
 			    {
 					Element el = attribute.getDOM();
+					EidasPersonAttributes eidasPersonAttributes = EidasNaturalPersonAttributes.GetValueOf(el.getAttribute("Name"));
+					if(eidasPersonAttributes == null){ /* Legal variant? */
+						eidasPersonAttributes = EidasLegalPersonAttributes.GetValueOf(el.getAttribute("Name"));
+					}
 					eidasReq.requestedAttributes.put(
-							EidasNaturalPersonAttributes.GetValueOf(el.getAttribute("Name")), 
+							eidasPersonAttributes,
 							Boolean.parseBoolean(el.getAttribute("isRequired")));
 			    }
 			}else if("SPType".equals(extension.getElementQName().getLocalPart())){

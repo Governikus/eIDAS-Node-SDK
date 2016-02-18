@@ -57,6 +57,17 @@ public class TemplateLoader {
 				map.put("placeOfBirth", StreamToString(TemplateLoader.class.getResourceAsStream("placeOfBirth_template.xml")));
 				map.put("metadatanode", StreamToString(TemplateLoader.class.getResourceAsStream("metadata_nodes_template.xml")));	
 				map.put("failresp", StreamToString(TemplateLoader.class.getResourceAsStream("fail_resp_template.xml")));
+
+				map.put("d201217euidentifier", StreamToString(TemplateLoader.class.getResourceAsStream("d201217euidentifier_template.xml")));
+				map.put("eori", StreamToString(TemplateLoader.class.getResourceAsStream("eori_template.xml")));
+				map.put("legalentityidentifier", StreamToString(TemplateLoader.class.getResourceAsStream("legalentityidentifier_template.xml")));
+				map.put("legalname", StreamToString(TemplateLoader.class.getResourceAsStream("legalname_template.xml")));
+				map.put("legalpersonaddress", StreamToString(TemplateLoader.class.getResourceAsStream("legalpersonaddress_template.xml")));
+				map.put("legalpersonidentifier", StreamToString(TemplateLoader.class.getResourceAsStream("legalpersonidentifier_template.xml")));
+				map.put("seed", StreamToString(TemplateLoader.class.getResourceAsStream("seed_template.xml")));
+				map.put("sic", StreamToString(TemplateLoader.class.getResourceAsStream("sic_template.xml")));
+				map.put("taxreference", StreamToString(TemplateLoader.class.getResourceAsStream("taxreference_template.xml")));
+				map.put("vatregistration", StreamToString(TemplateLoader.class.getResourceAsStream("vatregistration_template.xml")));
 				isInit = true;
 		}
 		

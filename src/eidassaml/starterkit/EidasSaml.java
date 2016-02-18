@@ -40,6 +40,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
@@ -115,13 +116,13 @@ public class EidasSaml {
 	 * @throws TransformerFactoryConfigurationError thrown if there is a problem to create the saml request
 	 * @throws TransformerException thrown if there is a problem to create the saml request
 	 */
-	public static byte[] CreateRequest(String _issuer, String _destination, String _providerName, EidasSigner _signer, Map<EidasNaturalPersonAttributes, Boolean> _requestedAttributes) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
+	public static byte[] CreateRequest(String _issuer, String _destination, String _providerName, EidasSigner _signer, Map<EidasPersonAttributes, Boolean> _requestedAttributes) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
 		Init();
 		EidasRequest eidasRequest = new EidasRequest(_destination, _issuer,_providerName, _signer);
 		return eidasRequest.generate(_requestedAttributes);
 	}
 	
-	public static byte[] CreateRequest(String _issuer, String _destination, EidasSigner _signer, Map<EidasNaturalPersonAttributes, Boolean> _requestedAttributes) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
+	public static byte[] CreateRequest(String _issuer, String _destination, EidasSigner _signer, Map<EidasPersonAttributes, Boolean> _requestedAttributes) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
 		Init();
 		EidasRequest eidasRequest = new EidasRequest(_destination, _issuer,Constants.DefaultProviderName, _signer);
 		return eidasRequest.generate(_requestedAttributes);
@@ -150,13 +151,13 @@ public class EidasSaml {
 	 * @throws TransformerFactoryConfigurationError thrown if there is a problem to create the saml request
 	 * @throws TransformerException thrown if there is a problem to create the saml request
 	 */
-	public static byte[] CreateRequest(String _issuer, String _destination,String _providerName, EidasSigner _signer, Map<EidasNaturalPersonAttributes, Boolean> _requestedAttributes,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
+	public static byte[] CreateRequest(String _issuer, String _destination,String _providerName, EidasSigner _signer, Map<EidasPersonAttributes, Boolean> _requestedAttributes,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
 		Init();
 		EidasRequest eidasRequest = new EidasRequest(_destination,_selectorType,_nameIdPolicy,_loa, _issuer,_providerName, _signer);
 		return eidasRequest.generate(_requestedAttributes);
 	}
 	
-	public static byte[] CreateRequest(String _issuer, String _destination, EidasSigner _signer, Map<EidasNaturalPersonAttributes, Boolean> _requestedAttributes,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
+	public static byte[] CreateRequest(String _issuer, String _destination, EidasSigner _signer, Map<EidasPersonAttributes, Boolean> _requestedAttributes,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
 		Init();
 		EidasRequest eidasRequest = new EidasRequest(_destination,_selectorType,_nameIdPolicy,_loa, _issuer,Constants.DefaultProviderName, _signer);
 		return eidasRequest.generate(_requestedAttributes);

@@ -30,24 +30,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.*;
 import org.opensaml.Configuration;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Attribute;
 import org.opensaml.saml2.core.AttributeStatement;
 import org.opensaml.saml2.core.EncryptedAssertion;
-import org.opensaml.saml2.core.Status;
 import org.opensaml.saml2.core.StatusCode;
-import org.opensaml.saml2.core.impl.StatusResponseTypeImpl;
 import org.opensaml.saml2.encryption.Decrypter;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.encryption.DecryptionException;
@@ -68,24 +66,10 @@ import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.signature.Signer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import eidassaml.starterkit.Constants;
-import eidassaml.starterkit.EidasEncrypter;
-import eidassaml.starterkit.EidasSigner;
-import eidassaml.starterkit.ErrorCode;
-import eidassaml.starterkit.ErrorCodeException;
-import eidassaml.starterkit.Utils;
-import eidassaml.starterkit.XMLSignatureHandler;
-import eidassaml.starterkit.natural_persons_attribute.AbstractNameAttribute;
-import eidassaml.starterkit.natural_persons_attribute.BirthNameAttribute;
-import eidassaml.starterkit.natural_persons_attribute.CurrentAddressAttribute;
-import eidassaml.starterkit.natural_persons_attribute.DateOfBirthAttribute;
-import eidassaml.starterkit.natural_persons_attribute.FamilyNameAttribute;
-import eidassaml.starterkit.natural_persons_attribute.GivenNameAttribute;
-import eidassaml.starterkit.natural_persons_attribute.PersonIdentifyerAttribute;
-import eidassaml.starterkit.natural_persons_attribute.PlaceOfBirthAttribute;
+import eidassaml.starterkit.person_attributes.AbstractAttribute;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.PersonIdentifierAttribute;
 import eidassaml.starterkit.template.TemplateLoader;
 
 /**
@@ -455,62 +439,36 @@ public class EidasResponse {
 	        		eidasResp.nameId = new EidasUnspecifiedNameId(assertion.getSubject().getNameID().getValue());
 	        	}
 	        }
-	        for(AttributeStatement attStat : assertion.getAttributeStatements())
-	        {
-	        	
-	        	for(Attribute att : attStat.getAttributes())
-	        	{
-	        		if(att.getAttributeValues().size() < 1)
-	        			continue;
-	        		XMLObject attributeValue = att.getAttributeValues().get(0); //IN EIDAS there is just one value except familyname!
-	        		Element domElement = attributeValue.getDOM();
-	        		EidasNaturalPersonAttributes personAttributes = EidasNaturalPersonAttributes.GetValueOf(att.getName());
-	        		if(personAttributes == EidasNaturalPersonAttributes.BirthName)
-	        		{
-	        			BirthNameAttribute bnameAttribute = new BirthNameAttribute(Utils.TrimAndRemoveLineBreaks(domElement.getTextContent()));			
-	        			ParseNameAttributeForTransliteratedValue(bnameAttribute,att);
-	        			
-	        			eidasResp.attributes.add(bnameAttribute); 
-	        		
-	        		}else if(personAttributes == EidasNaturalPersonAttributes.CurrentAddress)
-	        		{
-	        			String base64Value = domElement.getTextContent();
-	        			String decoded = Utils.FromBase64(base64Value);
-	        			try {
-							eidasResp.attributes.add(new CurrentAddressAttribute(decoded));
-						} catch (SAXException e) {
-							throw new XMLParserException("Invaild CurrentAddressAttribute XML value", e);
-						}
-	        			
-	        		}else if(personAttributes == EidasNaturalPersonAttributes.DateOfBirth)
-	        		{
-	        			eidasResp.attributes.add(new DateOfBirthAttribute(domElement.getTextContent()));
-	        		}else if(personAttributes == EidasNaturalPersonAttributes.FamilyName)
-	        		{
-	        			FamilyNameAttribute familyNameAttribute = new FamilyNameAttribute(Utils.TrimAndRemoveLineBreaks(domElement.getTextContent()));			
-	        			ParseNameAttributeForTransliteratedValue(familyNameAttribute,att);
-	        			
-	        			eidasResp.attributes.add(familyNameAttribute); 
-	        			
-	        		}else if(personAttributes == EidasNaturalPersonAttributes.FirstName)
-	        		{
-	        			GivenNameAttribute nameAttribute = new GivenNameAttribute(Utils.TrimAndRemoveLineBreaks(domElement.getTextContent()));			
-	        			ParseNameAttributeForTransliteratedValue(nameAttribute,att);
-	        			
-	        			eidasResp.attributes.add(nameAttribute); 
-	        		}else if(personAttributes == EidasNaturalPersonAttributes.PersonIdentifier)
-	        		{
-	        			//TODO WE NEED THIS?
-	        			eidasResp.attributes.add(new PersonIdentifyerAttribute(Utils.TrimAndRemoveLineBreaks(domElement.getTextContent())));
-	        		}else if(personAttributes == EidasNaturalPersonAttributes.PlaceOfBirth)
-	        		{
-	        			eidasResp.attributes.add(new PlaceOfBirthAttribute(Utils.TrimAndRemoveLineBreaks(domElement.getTextContent())));
-	        		}else{
-	        			//TODO Error????
-	        		}
-	        	}
-	        	
-	        }
+
+			for (AttributeStatement attStat : assertion.getAttributeStatements()) {
+
+				for (Attribute att : attStat.getAttributes()) {
+					if (att.getAttributeValues().size() < 1) {
+						continue;
+					}
+					XMLObject attributeValue = att.getAttributeValues().get(0); //IN EIDAS there is just one value except familyname!
+					Element domElement = attributeValue.getDOM();
+
+                    /* Get Person Attribute from the DOM */
+					EidasPersonAttributes personAttributes = EidasNaturalPersonAttributes.GetValueOf(att.getName());
+					if(personAttributes == null){
+						personAttributes = EidasLegalPersonAttributes.GetValueOf(att.getName());
+					}
+					if(personAttributes == null){
+						throw new IllegalArgumentException("No attribute known with name: " + att.getName());
+					}
+
+					EidasAttribute eidasAttribute = personAttributes.getInstance();
+					eidasAttribute.setValue(domElement.getTextContent());
+					if(att.getAttributeValues().size() == 2){
+						eidasAttribute.setTransliteratedLangId(att.getAttributeValues().get(1).getDOM().getTextContent());
+					}
+					eidasResp.attributes.add(eidasAttribute);
+
+				}
+
+			}
+
 	    }
 		
 		resp.getAssertions().clear();
@@ -541,17 +499,17 @@ public class EidasResponse {
 	 }
 	
 	
-	private static void ParseNameAttributeForTransliteratedValue(AbstractNameAttribute nameAttribute, Attribute att)
+	private static void ParseNameAttributeForTransliteratedValue(AbstractAttribute nameAttribute, Attribute att)
 	{
 		if(att.getAttributeValues().size() == 2)
 		{
 			Element domElement = att.getAttributeValues().get(1).getDOM();
 			nameAttribute.setTransliteratedValue(Utils.TrimAndRemoveLineBreaks(domElement.getTextContent()));
-			if(domElement.hasAttribute(AbstractNameAttribute.IS_LATIIN_SCRIPT_ATTRIBUTENAME)){
+			if(domElement.hasAttribute(AbstractAttribute.IS_LATIN_SCRIPT_ATTRIBUTENAME)){
 				nameAttribute.setLatinScript(
 						Boolean.valueOf(
 								domElement.getAttribute(
-										AbstractNameAttribute.IS_LATIIN_SCRIPT_ATTRIBUTENAME)
+										AbstractAttribute.IS_LATIN_SCRIPT_ATTRIBUTENAME)
 										).booleanValue());
 			}
 		}

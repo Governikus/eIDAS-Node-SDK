@@ -17,37 +17,53 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package eidassaml.starterkit.natural_persons_attribute;
+package eidassaml.starterkit.person_attributes.natural_persons_attribute;
 
 import eidassaml.starterkit.EidasAttribute;
 import eidassaml.starterkit.EidasNaturalPersonAttributes;
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import eidassaml.starterkit.template.TemplateLoader;
 
-public class BirthNameAttribute extends AbstractNameAttribute{
+public class PlaceOfBirthAttribute implements EidasAttribute{
 	
-	public BirthNameAttribute(String value) {
-		super(value);
+	private String value;
+
+	public PlaceOfBirthAttribute(){}
+	public PlaceOfBirthAttribute(String value) {
+		super();
+		this.value = value;
 	}
 	
-	public BirthNameAttribute(String value, String transliteratedValue) {
-		super(value,transliteratedValue);
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public String generate() {
+		// TODO Auto-generated method stub
+		return TemplateLoader.GetTemplateByName("placeOfBirth").replace("$value", value);
 	}
 
 	@Override
 	public String type() {
 		// TODO Auto-generated method stub
-		return EidasAttribute.TYPE_BirthName;
+		return EidasAttribute.TYPE_PlaceOfBirth;
 	}
-
+	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
 		return type() + " " + getValue();
 	}
-
+	
 	@Override
-	public EidasNaturalPersonAttributes getNaturalPersonAttributeType() {
+	public EidasPersonAttributes getPersonAttributeType() {
 		// TODO Auto-generated method stub
-		return EidasNaturalPersonAttributes.BirthName;
-	}	
+		return EidasNaturalPersonAttributes.PlaceOfBirth;
+	}
+
 }
