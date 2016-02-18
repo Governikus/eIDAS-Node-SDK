@@ -17,27 +17,41 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package eidassaml.starterkit.natural_persons_attribute;
+package eidassaml.starterkit.person_attributes.natural_persons_attribute;
 
 import eidassaml.starterkit.EidasAttribute;
 import eidassaml.starterkit.EidasNaturalPersonAttributes;
 import eidassaml.starterkit.Utils;
-import eidassaml.starterkit.template.TemplateLoader;
+import eidassaml.starterkit.person_attributes.AbstractAttribute;
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 
-public class GivenNameAttribute extends AbstractNameAttribute{
+public class FamilyNameAttribute extends AbstractAttribute {
 
-	public GivenNameAttribute(String value) {
-		super(value);
-	}
-	
-	public GivenNameAttribute(String value, String transliteratedValue) {
+	public FamilyNameAttribute(){}
+
+	public FamilyNameAttribute(String value, String transliteratedValue) {
 		super(value,transliteratedValue);
 	}
-
 	
+	public FamilyNameAttribute(String value) {
+		super(value);
+	}
+
+	@Override
+	public String getTemplateName() {
+		return Utils.IsNullOrEmpty(getTransliteratedValue()) ? "familyname" : "familyname_transliterated";
+	}
+
 	@Override
 	public String type() {
-		return EidasAttribute.TYPE_GivenName;
+		// TODO Auto-generated method stub
+		return EidasAttribute.TYPE_FamilyName;
+	}
+
+	@Override
+	public EidasPersonAttributes getPersonAttributeType() {
+		// TODO Auto-generated method stub
+		return EidasNaturalPersonAttributes.FamilyName;
 	}
 	
 	@Override
@@ -45,8 +59,4 @@ public class GivenNameAttribute extends AbstractNameAttribute{
 		return type() + " " + this.getValue();
 	}
 
-	@Override
-	public EidasNaturalPersonAttributes getNaturalPersonAttributeType() {
-		return EidasNaturalPersonAttributes.FirstName;
-	}
 }

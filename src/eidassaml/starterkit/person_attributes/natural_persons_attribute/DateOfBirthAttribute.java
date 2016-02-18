@@ -17,38 +17,41 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package eidassaml.starterkit.natural_persons_attribute;
+package eidassaml.starterkit.person_attributes.natural_persons_attribute;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import eidassaml.starterkit.EidasAttribute;
 import eidassaml.starterkit.EidasNaturalPersonAttributes;
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import eidassaml.starterkit.template.TemplateLoader;
 
 public class DateOfBirthAttribute implements EidasAttribute{
 
 	public static final SimpleDateFormat BirthDF = new SimpleDateFormat("yyyy-MM-dd");
-	
-	private String dateOfBith;
-	
+
+	private String dateOfBirth;
+
+	public DateOfBirthAttribute(){}
+
 	public DateOfBirthAttribute(String date) {
 		super();
-		this.dateOfBith = date;
+		this.dateOfBirth = date;
 	}
 	
 	public DateOfBirthAttribute(Date date) {
 		super();
-		this.dateOfBith = BirthDF.format(date);
+		this.dateOfBirth = BirthDF.format(date);
 	}
 	
 	public String getDate(){
-		return dateOfBith;
+		return dateOfBirth;
 	}
 
 	@Override
 	public String generate() {		
-		return TemplateLoader.GetTemplateByName("dateOfBirth").replace("$value", this.dateOfBith);
+		return TemplateLoader.GetTemplateByName("dateOfBirth").replace("$value", this.dateOfBirth);
 	}
 
 	@Override
@@ -63,9 +66,19 @@ public class DateOfBirthAttribute implements EidasAttribute{
 	}	
 	
 	@Override
-	public EidasNaturalPersonAttributes getNaturalPersonAttributeType() {
+	public EidasPersonAttributes getPersonAttributeType() {
 		// TODO Auto-generated method stub
 		return EidasNaturalPersonAttributes.DateOfBirth;
+	}
+
+	@Override
+	public void setValue(String value) {
+		this.dateOfBirth=value;
+	}
+
+	@Override
+	public String getValue() {
+		return dateOfBirth;
 	}
 
 }

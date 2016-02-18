@@ -17,50 +17,52 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package eidassaml.starterkit.natural_persons_attribute;
+package eidassaml.starterkit.person_attributes.natural_persons_attribute;
 
 import eidassaml.starterkit.EidasAttribute;
 import eidassaml.starterkit.EidasNaturalPersonAttributes;
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import eidassaml.starterkit.template.TemplateLoader;
 
-public class PersonIdentifyerAttribute implements EidasAttribute{
-
-	private String id;
+public class GenderAttribute implements EidasAttribute{
 	
-	public PersonIdentifyerAttribute(String id) {
+	private GenderType value;
+	
+	public GenderAttribute(GenderType value) {
 		super();
-		this.id = id;
-	}
-	
-	public String getId(){
-		return id;
-	}
-	
-	public String getValue()
-	{
-		return id;
+		this.value = value;
 	}
 
+	public GenderAttribute(){}
+
+	public String getValue() {
+		return value.NAME;
+	}
+
+	public void setValue(GenderType value) {
+		this.value = value;
+	}
+	
 	@Override
-	public String generate() {		
-		return TemplateLoader.GetTemplateByName("personId").replace("$value", this.id);
+	public String generate() {
+		return TemplateLoader.GetTemplateByName("gender").replace("$value", value.NAME);
 	}
 
 	@Override
 	public String type() {
-		// TODO Auto-generated method stub
-		return EidasAttribute.TYPE_PersonId;
+		return "GenderAttribute";
 	}
 	
 	@Override
-	public String toString() {
-		return type() + " " + id;
-	}
-	
-	@Override
-	public EidasNaturalPersonAttributes getNaturalPersonAttributeType() {
+	public EidasPersonAttributes getPersonAttributeType() {
 		// TODO Auto-generated method stub
-		return EidasNaturalPersonAttributes.PersonIdentifier;
+		return EidasNaturalPersonAttributes.Gender;
 	}
+
+	@Override
+	public void setValue(String value) {
+		this.value = GenderType.GetValueOf(value);
+	}
+
 
 }

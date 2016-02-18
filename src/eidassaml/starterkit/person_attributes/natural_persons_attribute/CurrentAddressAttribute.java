@@ -17,19 +17,16 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package eidassaml.starterkit.natural_persons_attribute;
+package eidassaml.starterkit.person_attributes.natural_persons_attribute;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -41,7 +38,7 @@ import eidassaml.starterkit.template.TemplateLoader;
 
 public class CurrentAddressAttribute implements EidasAttribute{
 
-	private final static String CVAddressTemp = "<eidas:LocatorDesignator>$locatorDesignator</eidas:LocatorDesignator>"+
+	protected final static String CVAddressTemp = "<eidas:LocatorDesignator>$locatorDesignator</eidas:LocatorDesignator>"+
 											"<eidas:Thoroughfare>$thoroughfare</eidas:Thoroughfare>"+
 											"<eidas:PostName>$postName</eidas:PostName>"+
 											"<eidas:PostCode>$postCode</eidas:PostCode>";
@@ -50,6 +47,8 @@ public class CurrentAddressAttribute implements EidasAttribute{
 	private String thoroughfare;
 	private String postName;
 	private String postCode;
+
+	public CurrentAddressAttribute(){}
 
 	public CurrentAddressAttribute(String locatorDesignator,
 			String thoroughfare, String postName, String postCode) {
@@ -135,10 +134,34 @@ public class CurrentAddressAttribute implements EidasAttribute{
 	}
 	
 	@Override
-	public EidasNaturalPersonAttributes getNaturalPersonAttributeType() {
+	public EidasPersonAttributes getPersonAttributeType() {
 		return EidasNaturalPersonAttributes.CurrentAddress;
 	}
-	
+
+	@Override
+	public void setValue(String value) {
+		SAXParserFactory factory = SAXParserFactory.newInstance();
+		try {
+			String xml = "<root>"+value+"</root>";
+			SAXParser saxParser = factory.newSAXParser();
+			AddressAttributeXMLHandler handler = new AddressAttributeXMLHandler();
+			saxParser.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")), handler);
+			this.locatorDesignator = handler.locatorDesignator;
+			this.thoroughfare = handler.thoroughfare;
+			this.postName = handler.postName;
+			this.postCode = handler.postCode;
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			throw new IllegalArgumentException("Could not parse address", e);
+		}
+	}
+
+	public String getValue() {
+		return CVAddressTemp.replace("$locatorDesignator", getLocatorDesignator())
+				.replace("$thoroughfare", getThoroughfare())
+				.replace("$postName", getPostName())
+				.replace("$postCode", getPostCode());
+	}
+
 	class AddressAttributeXMLHandler extends DefaultHandler {
 		
 		private String locatorDesignator = "";

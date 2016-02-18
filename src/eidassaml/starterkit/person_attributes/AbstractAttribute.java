@@ -17,32 +17,33 @@
  * Authors: Governikus GmbH & Co. KG
  * 
 */
-package eidassaml.starterkit.natural_persons_attribute;
+package eidassaml.starterkit.person_attributes;
 
 import eidassaml.starterkit.EidasAttribute;
-import eidassaml.starterkit.EidasNaturalPersonAttributes;
 import eidassaml.starterkit.Utils;
 import eidassaml.starterkit.template.TemplateLoader;
 
-public abstract class AbstractNameAttribute implements EidasAttribute{
+public abstract class AbstractAttribute implements EidasAttribute{
 
-	public final static String IS_LATIIN_SCRIPT_ATTRIBUTENAME= "LatinScript";
-	
+	public final static String IS_LATIN_SCRIPT_ATTRIBUTENAME = "LatinScript";
+
 	private String value;
 	private String transliteratedValue;
 	private boolean isLatinScript = true;
-		
-	public AbstractNameAttribute(String value, String transliteratedValue) {
+
+	public AbstractAttribute(String value, String transliteratedValue) {
 		super();
 		this.value = value;
 		this.transliteratedValue = transliteratedValue;
 	}
-	
-	public AbstractNameAttribute(String value) {
+
+	public AbstractAttribute(String value) {
 		super();
 		this.value = value;
 		this.transliteratedValue = null;
 	}
+
+	public AbstractAttribute(){}
 
 	public String getValue() {
 		return value;
@@ -68,32 +69,21 @@ public abstract class AbstractNameAttribute implements EidasAttribute{
 		this.isLatinScript = isLatinScript;
 	}
 
+    /**
+     * Return the template used for the generation of XML
+     * @return The template of the NameAttribute, which will be used to create the XML representation of the attribute.
+     */
+    public abstract String getTemplateName();
+
 	@Override
 	public String generate() {
-		String template = "";
-		if(Utils.IsNullOrEmpty(transliteratedValue)){			
-			if(this.getNaturalPersonAttributeType() == EidasNaturalPersonAttributes.FamilyName){
-				template = TemplateLoader.GetTemplateByName("familyname");
-			}else if(this.getNaturalPersonAttributeType() == EidasNaturalPersonAttributes.FirstName){
-				template = TemplateLoader.GetTemplateByName("givenname");
-			}else{
-				template = TemplateLoader.GetTemplateByName("birthName");
-			}
-			return template.replace("$value", value);
-		}else{
-			
-			if(this.getNaturalPersonAttributeType() == EidasNaturalPersonAttributes.FamilyName){
-				template = TemplateLoader.GetTemplateByName("familyname_transliterated");
-			}else if(this.getNaturalPersonAttributeType() == EidasNaturalPersonAttributes.FirstName){
-				template = TemplateLoader.GetTemplateByName("givenname_transliterated");
-			}else{
-				template = TemplateLoader.GetTemplateByName("birthName_transliterated");
-			}
-			return template.replace("$value", value).replace("$transliteratedvalue", transliteratedValue)
-					.replace("$isLatinScript", String.valueOf(isLatinScript));
-		}
+		String template = TemplateLoader.GetTemplateByName(getTemplateName());
+        if (Utils.IsNullOrEmpty(transliteratedValue)){
+            return template.replace("$value", value);
+        }else{
+            return template.replace("$value", value).replace("$transliteratedvalue", transliteratedValue)
+                    .replace("$isLatinScript", String.valueOf(isLatinScript));
+        }
 	}
-	
-	
-	
+
 }

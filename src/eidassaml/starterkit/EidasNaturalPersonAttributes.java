@@ -19,68 +19,61 @@
 */
 package eidassaml.starterkit;
 
-public enum EidasNaturalPersonAttributes {
-		
-FirstName("http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "FirstName"), 
-BirthName("http://eidas.europa.eu/attributes/naturalperson/BirthName", "BirthName"),
-FamilyName("http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "FamilyName"),
-DateOfBirth("http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "DateOfBirth"),
-PlaceOfBirth("http://eidas.europa.eu/attributes/naturalperson/PlaceOfBirth", "PlaceOfBirth"),
-Gender("http://eidas.europa.eu/attributes/naturalperson/Gender", "Gender"),
-CurrentAddress("http://eidas.europa.eu/attributes/naturalperson/CurrentAddress", "CurrentAddress"),
-PersonIdentifier("http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "PersonIdentifier");
-	
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.BirthNameAttribute;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.CurrentAddressAttribute;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.DateOfBirthAttribute;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.FamilyNameAttribute;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.GenderAttribute;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.GivenNameAttribute;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.PersonIdentifierAttribute;
+import eidassaml.starterkit.person_attributes.natural_persons_attribute.PlaceOfBirthAttribute;
+
+public enum EidasNaturalPersonAttributes implements EidasPersonAttributes{
+	FirstName("http://eidas.europa.eu/attributes/naturalperson/CurrentGivenName", "FirstName", GivenNameAttribute.class),
+	BirthName("http://eidas.europa.eu/attributes/naturalperson/BirthName", "BirthName", BirthNameAttribute.class),
+	FamilyName("http://eidas.europa.eu/attributes/naturalperson/CurrentFamilyName", "FamilyName", FamilyNameAttribute.class),
+	DateOfBirth("http://eidas.europa.eu/attributes/naturalperson/DateOfBirth", "DateOfBirth", DateOfBirthAttribute.class),
+	PlaceOfBirth("http://eidas.europa.eu/attributes/naturalperson/PlaceOfBirth", "PlaceOfBirth", PlaceOfBirthAttribute.class),
+	Gender("http://eidas.europa.eu/attributes/naturalperson/Gender", "Gender", GenderAttribute.class),
+	CurrentAddress("http://eidas.europa.eu/attributes/naturalperson/CurrentAddress", "CurrentAddress", CurrentAddressAttribute.class),
+	PersonIdentifier("http://eidas.europa.eu/attributes/naturalperson/PersonIdentifier", "PersonIdentifier", PersonIdentifierAttribute.class);
 	public final String NAME;
 	public final String FRIENDLY_NAME;
-	
-	private EidasNaturalPersonAttributes(String name, String friendlyName){
+	public final Class<? extends EidasAttribute> ATTRIBUTE_CLASS;
+
+	EidasNaturalPersonAttributes(String name, String friendlyName, Class<? extends EidasAttribute> attrClass){
 		NAME = name;
 		FRIENDLY_NAME = friendlyName;
+		ATTRIBUTE_CLASS = attrClass;
 	}
-		
-	public static EidasNaturalPersonAttributes GetValueOf(String s)
-	{
-		if(FirstName.NAME.equals(s))
-		{
-			return FirstName;
+
+	public static EidasNaturalPersonAttributes GetValueOf(String s) {
+		for (EidasNaturalPersonAttributes enpa : EidasNaturalPersonAttributes.values()) {
+			if (enpa.NAME.equals(s)) {
+				return enpa;
+			}
 		}
-		
-		if(BirthName.NAME.equals(s))
-		{
-			return BirthName;
-		}
-		
-		if(FamilyName.NAME.equals(s))
-		{
-			return FamilyName;
-		}
-		
-		if(DateOfBirth.NAME.equals(s))
-		{
-			return DateOfBirth;
-		}
-		
-		if(PlaceOfBirth.NAME.equals(s))
-		{
-			return PlaceOfBirth;
-		}
-		
-		if(Gender.NAME.equals(s))
-		{
-			return Gender;
-		}
-		
-		if(CurrentAddress.NAME.equals(s))
-		{
-			return CurrentAddress;
-		}
-		
-		if(PersonIdentifier.NAME.equals(s))
-		{
-			return PersonIdentifier;
-		}
-		
 		return null;
 	}
-	
+
+	/**
+	 * Create an instance of the EidasAttribute corresponding to the NaturalPersonAttribute type
+	 * @return instance of EidasAttribute corresponding to the NaturalPersonAttribute type
+     */
+	public EidasAttribute getInstance(){
+		try {
+			return ATTRIBUTE_CLASS.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new IllegalStateException("Unable to instantiate attribute type.", e);
+		}
+	}
+
+	public String getName(){
+		return NAME;
+	}
+
+	public String getFriendlyName(){
+		return FRIENDLY_NAME;
+	}
 }
