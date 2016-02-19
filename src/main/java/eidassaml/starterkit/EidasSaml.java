@@ -367,11 +367,11 @@ public class EidasSaml {
 		
 		SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		
-		StreamSource s2 = new StreamSource(EidasSaml.class.getResourceAsStream("saml-schema-protocol-2_0.xsd"));
-		StreamSource s1 = new StreamSource(EidasSaml.class.getResourceAsStream("saml-schema-assertion-2_0.xsd"));	
-		StreamSource s3 = new StreamSource(EidasSaml.class.getResourceAsStream("xenc-schema.xsd"));
-		StreamSource s4 = new StreamSource(EidasSaml.class.getResourceAsStream("xmldsig-core-schema.xsd"));
-		StreamSource s5 = new StreamSource(EidasSaml.class.getResourceAsStream("NaturalPersonShema.xsd"));
+		StreamSource s2 = new StreamSource(EidasSaml.class.getResourceAsStream("/saml-schema-protocol-2_0.xsd"));
+		StreamSource s1 = new StreamSource(EidasSaml.class.getResourceAsStream("/saml-schema-assertion-2_0.xsd"));
+		StreamSource s3 = new StreamSource(EidasSaml.class.getResourceAsStream("/xenc-schema.xsd"));
+		StreamSource s4 = new StreamSource(EidasSaml.class.getResourceAsStream("/xmldsig-core-schema.xsd"));
+		StreamSource s5 = new StreamSource(EidasSaml.class.getResourceAsStream("/NaturalPersonShema.xsd"));
 		
 		Schema schema = sf.newSchema(new StreamSource[]{s5,s4,s3,s1,s2});
 		Validator validator = schema.newValidator();
