@@ -103,8 +103,6 @@ public class EidasSaml {
 	 * @param _providerName the response provider
 	 * @param _signer the author of the message
 	 * @param _requestedAttributes a list of the requestAttributes
-	 * @param _selectorType private sector or public sector SP
-	 * @param _nameIdPolicy defines the treatment of identifiers to be used in a cross-border context
 	 * @return signed saml xml request as byte array
 	 * @throws ConfigurationException thrown if the opensaml lib or eidas starterkit lib is not init
 	 * @throws CertificateEncodingException thrown if the signer is not valid
@@ -166,7 +164,7 @@ public class EidasSaml {
 	/**
 	 * Read a eidas saml request xml and creats a EidasRequest object
 	 * 
-	 * @param the eidas saml request
+	 * @param is the eidas saml request
 	 * @return a representation of the eidas saml request
 	 * @throws ConfigurationException thrown if the opensaml lib or eidas starterkit lib is not init
 	 * @throws XMLParserException thrown if there is a problem in the saml request xml
@@ -183,7 +181,7 @@ public class EidasSaml {
 	/**
 	 * Read a eidas saml request xml and checks the signatures
 	 * 
-	 * @param the eidas saml request
+	 * @param is the eidas saml request
 	 * @param authors a list of author certificates to check the signaures
 	 * @return a representation of the eidas saml request
 	 * @throws ConfigurationException thrown if the opensaml lib or eidas starterkit lib is not init
@@ -270,7 +268,7 @@ public class EidasSaml {
 	 * @throws TransformerFactoryConfigurationError
 	 * @throws TransformerException
 	 */
-	public static byte[] CreateMetaDataService(String id, String entityId, Date validUntil, X509Certificate sigCert, X509Certificate encCert, EidasOrganisation organisation, EidasContactPerson technicalcontact, EidasContactPerson supportContact, String postEndpoint, String redirectEndpoint, List<EidasNameIdType> supportedNameIdTypes, List<EidasNaturalPersonAttributes> attributes, EidasSigner signer) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
+	public static byte[] CreateMetaDataService(String id, String entityId, Date validUntil, X509Certificate sigCert, X509Certificate encCert, EidasOrganisation organisation, EidasContactPerson technicalcontact, EidasContactPerson supportContact, String postEndpoint, String redirectEndpoint, List<EidasNameIdType> supportedNameIdTypes, List<EidasPersonAttributes> attributes, EidasSigner signer) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
 		Init();
 		EidasMetadataService meta = new EidasMetadataService(id, entityId, validUntil, sigCert, encCert, organisation, technicalcontact, supportContact, postEndpoint, redirectEndpoint, supportedNameIdTypes);
 		return meta.generate(attributes, signer);
@@ -300,11 +298,9 @@ public class EidasSaml {
 	 * @param sigCert
 	 * @param encCert
 	 * @param organisation
-	 * @param contact
 	 * @param postEndpoint
 	 * @param _spType
 	 * @param supportedNameIdTypes
-	 * @param attributes
 	 * @param signer
 	 * @return
 	 * @throws ConfigurationException
@@ -367,11 +363,11 @@ public class EidasSaml {
 		
 		SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		
-		StreamSource s2 = new StreamSource(EidasSaml.class.getResourceAsStream("saml-schema-protocol-2_0.xsd"));
-		StreamSource s1 = new StreamSource(EidasSaml.class.getResourceAsStream("saml-schema-assertion-2_0.xsd"));	
-		StreamSource s3 = new StreamSource(EidasSaml.class.getResourceAsStream("xenc-schema.xsd"));
-		StreamSource s4 = new StreamSource(EidasSaml.class.getResourceAsStream("xmldsig-core-schema.xsd"));
-		StreamSource s5 = new StreamSource(EidasSaml.class.getResourceAsStream("NaturalPersonShema.xsd"));
+		StreamSource s2 = new StreamSource(EidasSaml.class.getResourceAsStream("/saml-schema-protocol-2_0.xsd"));
+		StreamSource s1 = new StreamSource(EidasSaml.class.getResourceAsStream("/saml-schema-assertion-2_0.xsd"));
+		StreamSource s3 = new StreamSource(EidasSaml.class.getResourceAsStream("/xenc-schema.xsd"));
+		StreamSource s4 = new StreamSource(EidasSaml.class.getResourceAsStream("/xmldsig-core-schema.xsd"));
+		StreamSource s5 = new StreamSource(EidasSaml.class.getResourceAsStream("/NaturalPersonShema.xsd"));
 		
 		Schema schema = sf.newSchema(new StreamSource[]{s5,s4,s3,s1,s2});
 		Validator validator = schema.newValidator();

@@ -40,6 +40,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.opensaml.Configuration;
@@ -92,7 +93,7 @@ public class EidasMetadataService {
 	private EidasContactPerson supportcontact;
 	private String postEndpoint;
 	private String redirectEndpoint;
-	private List<EidasNaturalPersonAttributes> attributes = new ArrayList<EidasNaturalPersonAttributes>();
+	private List<EidasPersonAttributes> attributes = new ArrayList<>();
 	private List<EidasNameIdType> supportedNameIdTypes = new ArrayList<EidasNameIdType>();
 	
 	private EidasMetadataService(){}
@@ -192,15 +193,15 @@ public class EidasMetadataService {
 		this.supportcontact = supportcontact;
 	}
 
-	public List<EidasNaturalPersonAttributes> getAttributes() {
+	public List<EidasPersonAttributes> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(List<EidasNaturalPersonAttributes> attributes) {
+	public void setAttributes(List<EidasPersonAttributes> attributes) {
 		this.attributes = attributes;
 	}
 
-	public byte[] generate(List<EidasNaturalPersonAttributes> attributes, EidasSigner signer) throws CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
+	public byte[] generate(List<EidasPersonAttributes> attributes, EidasSigner signer) throws CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
 	{
 		byte[] result = null;
 		String template = TemplateLoader.GetTemplateByName("metadataservice");
@@ -237,9 +238,9 @@ public class EidasMetadataService {
 		template=template.replace("$SUPPORTED_NAMEIDTYPES",sbSupportNameIDTypes.toString());
 		
 		StringBuilder sB = new StringBuilder();
-		for(EidasNaturalPersonAttributes att : attributes)
+		for(EidasPersonAttributes att : attributes)
 		{
-			sB.append(attributeTemplate.replace("$ATTFriendlyNAME", att.FRIENDLY_NAME).replace("$ATTName", att.NAME));
+			sB.append(attributeTemplate.replace("$ATTFriendlyNAME", att.getFriendlyName()).replace("$ATTName", att.getName()));
 		}
 		template=template.replace("$att", sB.toString());
 		
@@ -297,9 +298,13 @@ public class EidasMetadataService {
 				eidasMetadataService.setRedirectEndpoint(s.getLocation());
 			}
 		});
-		List<EidasNaturalPersonAttributes> attributes = new ArrayList<EidasNaturalPersonAttributes>();
+		List<EidasPersonAttributes> attributes = new ArrayList<>();
 		idpssoDescriptor.getAttributes().forEach(a->{
-			attributes.add(EidasNaturalPersonAttributes.GetValueOf(a.getName()));
+			EidasPersonAttributes eidasPersonAttributes = EidasNaturalPersonAttributes.GetValueOf(a.getName());
+			if(eidasPersonAttributes==null) { // Legal?
+				eidasPersonAttributes = EidasLegalPersonAttributes.GetValueOf(a.getName());
+			}
+			attributes.add(eidasPersonAttributes);
 		});
 		eidasMetadataService.setAttributes(attributes);
 		for(KeyDescriptor k : idpssoDescriptor.getKeyDescriptors())

@@ -204,7 +204,7 @@ public enum ErrorCode
 
   private final String samlStatus;
 
-  private static ResourceBundle messages = ResourceBundle.getBundle("eidassaml.starterkit.errorcodes");
+  private static ResourceBundle messages = ResourceBundle.getBundle("errorcodes");
 
   /**
    * Return human-readable text describing this code.
