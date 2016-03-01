@@ -67,6 +67,26 @@ public class CurrentAddressAttribute implements EidasAttribute{
 	 */
 	public CurrentAddressAttribute(String xmlString) throws SAXException
 	{
+		parseXML(xmlString);
+	}
+	
+	/**
+	 * Decode and parse the given xml string. Adds a root XML Container around the given CurrentAddressAttribute. Otherwise the XML is not well formed and will raise an exception
+	 * @param base64XmlString base64 encoded xmlstring 
+	 * 
+	 */
+	public void parseEncodedXML(String base64XmlString) throws SAXException
+	{
+		parseXML(Utils.FromBase64(xmlString));
+	}
+	
+	/**
+	 * parse the given xml string. Adds a root XML Container around the given CurrentAddressAttribute. Otherwise the XML is not well formed and will raise an exception
+	 * @param xmlString  
+	 * 
+	 */
+	public void parseXML(String xmlString) throws SAXException
+	{
 		SAXParserFactory factory = SAXParserFactory.newInstance();
 		try {
 			String xml = "<root>"+xmlString+"</root>";
@@ -79,7 +99,8 @@ public class CurrentAddressAttribute implements EidasAttribute{
 			this.postCode = handler.postCode;
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			throw new SAXException(e);
-		}
+		}	
+		
 	}
 	
 	public String getLocatorDesignator() {
@@ -138,21 +159,12 @@ public class CurrentAddressAttribute implements EidasAttribute{
 		return EidasNaturalPersonAttributes.CurrentAddress;
 	}
 
+	/**
+	 * the given value will parsed by parseEncodedXML(String)  
+	 */
 	@Override
 	public void setValue(String value) {
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		try {
-			String xml = "<root>"+value+"</root>";
-			SAXParser saxParser = factory.newSAXParser();
-			AddressAttributeXMLHandler handler = new AddressAttributeXMLHandler();
-			saxParser.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")), handler);
-			this.locatorDesignator = handler.locatorDesignator;
-			this.thoroughfare = handler.thoroughfare;
-			this.postName = handler.postName;
-			this.postCode = handler.postCode;
-		} catch (ParserConfigurationException | SAXException | IOException e) {
-			throw new IllegalArgumentException("Could not parse address", e);
-		}
+		parseEncodedXML(value);
 	}
 
 	public String getValue() {
