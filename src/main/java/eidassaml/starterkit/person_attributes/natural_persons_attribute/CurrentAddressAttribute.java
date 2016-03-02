@@ -77,7 +77,7 @@ public class CurrentAddressAttribute implements EidasAttribute{
 	 */
 	public void parseEncodedXML(String base64XmlString) throws SAXException
 	{
-		parseXML(Utils.FromBase64(xmlString));
+		parseXML(Utils.FromBase64(base64XmlString));
 	}
 	
 	/**
@@ -164,7 +164,11 @@ public class CurrentAddressAttribute implements EidasAttribute{
 	 */
 	@Override
 	public void setValue(String value) {
-		parseEncodedXML(value);
+		try{
+			parseEncodedXML(value);
+		}catch(Exception e){
+			
+		}
 	}
 
 	public String getValue() {
