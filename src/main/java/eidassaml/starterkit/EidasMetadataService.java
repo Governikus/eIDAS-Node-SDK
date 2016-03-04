@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -44,10 +45,13 @@ import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.opensaml.Configuration;
+import org.opensaml.common.SAMLObject;
 import org.opensaml.saml2.core.impl.AuthnRequestMarshaller;
+import org.opensaml.saml2.metadata.ContactPerson;
 import org.opensaml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.saml2.metadata.KeyDescriptor;
+import org.opensaml.saml2.metadata.Organization;
 import org.opensaml.saml2.metadata.impl.EntityDescriptorMarshaller;
 import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.io.Unmarshaller;
@@ -283,7 +287,9 @@ public class EidasMetadataService {
 		UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
 		Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(metadataRoot);
 		EntityDescriptor metaData = (EntityDescriptor)unmarshaller.unmarshall(metadataRoot);
-		
+		eidasMetadataService.setSupportcontact(unmarshalContactPerson(metaData.getContactPersons(), "support"));
+		eidasMetadataService.setTechnicalContact(unmarshalContactPerson(metaData.getContactPersons(), "technical"));
+		eidasMetadataService.setOrganisation(unmarshalOrganisation(metaData.getOrganization()));
 		eidasMetadataService.setId(metaData.getID());
 		eidasMetadataService.setEntityId(metaData.getEntityID());
 		eidasMetadataService.setValidUntil(metaData.getValidUntil().toDate());
@@ -319,6 +325,30 @@ public class EidasMetadataService {
 		}
 		
 		return eidasMetadataService;
+	}
+	
+	private static EidasContactPerson unmarshalContactPerson(List<ContactPerson> cps, String contactType){
+		for (ContactPerson cp : cps){
+		String company = cp.getCompany().getName() ;
+		String givenName = cp.getGivenName().getName();
+		String surName = cp.getSurName().getName();
+		String tel = cp.getTelephoneNumbers().get(0).getNumber(); 
+		String email = cp.getEmailAddresses().get(0).getAddress();
+		String type = cp.getType().toString();
+		EidasContactPerson ecp = new EidasContactPerson(company, givenName, surName, tel, email,type);
+		if (type != null && (type.toLowerCase()).equals(contactType.toLowerCase())){
+			return ecp;
+		}}
+		return null;
+	}
+	
+	private static EidasOrganisation unmarshalOrganisation(Organization org){
+		String displayName = org.getDisplayNames().get(0).getName().getLocalString();
+		String name = org.getOrganizationNames().get(0).getName().getLocalString();
+		String url = org.getURLs().get(0).getURL().getLocalString();
+		String langId = org.getDisplayNames().get(0).getName().getLanguage();
+		EidasOrganisation eorg = new EidasOrganisation(name, displayName, url, langId);
+		return eorg;
 	}
 
 	private static java.security.cert.X509Certificate GetFirstCertFromKeyDescriptor(

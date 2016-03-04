@@ -29,19 +29,28 @@ public class EidasContactPerson {
 	private String company;
 	private String givenName;
 	private String surName;
-	private String address;
 	private String tel;
 	private String email;
+	private String type;
 	
 	public EidasContactPerson(String company, String givenName, String surName,
-			String address, String tel, String email) {
+			 String tel, String email) {
 		super();
 		this.company = company;
 		this.givenName = givenName;
 		this.surName = surName;
-		this.address = address;
 		this.tel = tel;
 		this.email = email;
+	}
+	public EidasContactPerson(String company, String givenName, String surName,
+			 String tel, String email, String type) {
+		super();
+		this.company = company;
+		this.givenName = givenName;
+		this.surName = surName;
+		this.tel = tel;
+		this.email = email;
+		this.type = type;
 	}
 	public String getCompany() {
 		return company;
@@ -61,12 +70,6 @@ public class EidasContactPerson {
 	public void setSurName(String surName) {
 		this.surName = surName;
 	}
-	public String getAddress() {
-		return address;
-	}
-	public void setAddress(String address) {
-		this.address = address;
-	}
 	public String getTel() {
 		return tel;
 	}
@@ -78,6 +81,12 @@ public class EidasContactPerson {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getType(){
+		return type;
+	}
+	public void setType(String type){
+		this.type = type;
 	}
 	
 	
