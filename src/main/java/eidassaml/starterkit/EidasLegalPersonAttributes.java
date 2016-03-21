@@ -46,7 +46,7 @@ public enum EidasLegalPersonAttributes implements EidasPersonAttributes {
 
     public final String NAME;
     public final String FRIENDLY_NAME;
-    private final Class<? extends EidasAttribute> ATTRIBUTE_CLASS;
+    public final Class<? extends EidasAttribute> ATTRIBUTE_CLASS;
 
     EidasLegalPersonAttributes(String name, String friendlyName, Class<? extends EidasAttribute> attrClazz) {
         NAME = name;
