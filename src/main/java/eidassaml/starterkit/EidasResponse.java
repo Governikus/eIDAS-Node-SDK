@@ -202,8 +202,8 @@ public class EidasResponse {
 		
 		byte[] returnValue;
 		
-		String notBefore = SimpleDf.format(new Date(new Date().getTime() + (10 * ONE_MINUTE_IN_MILLIS))); //TODO set + 10min
-		String notAfter = SimpleDf.format(new Date()); 
+		String notBefore = SimpleDf.format(new Date());
+		String notAfter = SimpleDf.format(new Date(new Date().getTime() + (10 * ONE_MINUTE_IN_MILLIS))); //TODO set + 10min 
 		String respTemp = TemplateLoader.GetTemplateByName("resp");
 		String assoTemp = TemplateLoader.GetTemplateByName("asso");
 		StringBuilder attributeString = new StringBuilder();
