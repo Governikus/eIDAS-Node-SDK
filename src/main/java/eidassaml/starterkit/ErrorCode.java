@@ -190,7 +190,12 @@ public enum ErrorCode
   /**
    * Non of the IdPs given in the IDPList in the SAML Request are supported.
    */
-  NO_SUPPORTED_IDP(StatusCode.NO_SUPPORTED_IDP_URI), ;
+  NO_SUPPORTED_IDP(StatusCode.NO_SUPPORTED_IDP_URI), 
+  
+  /**
+   * Request was denied, ie citizen consent not given
+   */
+  REQUEST_DENIED(StatusCode.REQUEST_DENIED_URI);
 
   /**
    * prefix to make all the minor error codes look URN-like
@@ -394,6 +399,11 @@ public enum ErrorCode
 	  {
 		  return CLIENT_ERROR;
 	  }
+	  if(REQUEST_DENIED.getSamlStatus().equals(s)) 
+	  {
+		  return REQUEST_DENIED;
+	  }
+	  
 	  	  
 	  return null;
   }
