@@ -227,6 +227,37 @@ public class EidasSaml {
 	}
 	
 	/**
+	 * Creates a signed eidas saml error response
+	 * 
+	 * @param code
+	 * @param msg
+	 * @param _destination
+	 * @param _nameid
+	 * @param _issuer
+	 * @param _inResponseTo
+	 * @param _encrypter
+	 * @param _signer
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws CertificateEncodingException
+	 * @throws XMLParserException
+	 * @throws IOException
+	 * @throws UnmarshallingException
+	 * @throws EncryptionException
+	 * @throws MarshallingException
+	 * @throws SignatureException
+	 * @throws TransformerFactoryConfigurationError
+	 * @throws TransformerException
+	 */
+	public static byte[] CreateErrorResponse(ErrorCode code, String msg, String _destination, EidasNameId _nameid, String _issuer, String _inResponseTo, EidasEncrypter _encrypter,EidasSigner _signer) throws ConfigurationException, CertificateEncodingException, XMLParserException, IOException, UnmarshallingException, EncryptionException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
+	{
+		Init();
+		EidasResponse response = new EidasResponse(_destination, _nameid,_inResponseTo, _issuer, _signer, _encrypter);
+		return response.generateErrorRsp(code, msg);	
+	}
+	
+	
+	/**
 	 * 
 	 * @param is
 	 * @param decryptionKeyPairs
