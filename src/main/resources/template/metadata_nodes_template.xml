@@ -26,8 +26,7 @@
             </md:KeyDescriptor>
             $SUPPORTED_NAMEIDTYPES
             <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                Location="$POST_ENDPOINT" 
-                isDefault="true"/>           
+                Location="$POST_ENDPOINT" index="1" isDefault="true"/>
         </md:SPSSODescriptor>
         <md:Organization>
 			<md:OrganizationName xml:lang="$landID">$orgName</md:OrganizationName>
