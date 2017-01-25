@@ -9,7 +9,7 @@
         xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
         >$Issuer</saml2:Issuer>
     <saml2p:Extensions>
-        <eidas:SPType>$SPType</eidas:SPType>
+        $SPType
         <eidas:RequestedAttributes>
 			$requestAttributes
         </eidas:RequestedAttributes>

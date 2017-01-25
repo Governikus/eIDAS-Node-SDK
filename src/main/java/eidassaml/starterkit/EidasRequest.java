@@ -149,7 +149,12 @@ public class EidasRequest {
 		template = template.replace("$requestAttributes", attributesBuilder.toString());
 		template = template.replace("$NameIDPolicy",nameIdPolicy.NAME);
 		template = template.replace("$AuthClassRef",authClassRef.NAME);
-		template = template.replace("$SPType",selectorType.NAME);
+		if (null != selectorType) {
+			template = template.replace("$SPType","<eidas:SPType>" + selectorType.NAME + "</eidas:SPType>");
+		}
+		else {
+			template = template.replace("$SPType", "");
+		}
 		
 		BasicParserPool ppMgr = new BasicParserPool();
 		ppMgr.setNamespaceAware(true);

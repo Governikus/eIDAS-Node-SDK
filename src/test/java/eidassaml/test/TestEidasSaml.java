@@ -180,11 +180,11 @@ public class TestEidasSaml {
 		BirthNameAttribute birthName = new BirthNameAttribute("Meyer");
 		CurrentAddressAttribute currentAddress = new CurrentAddressAttribute("Am Fallturm","33","Bremen","28207");
 		DateOfBirthAttribute dao = new DateOfBirthAttribute("1982-02-11");
-		FamilyNameAttribute familyName =  new FamilyNameAttribute("Müller");
+		FamilyNameAttribute familyName =  new FamilyNameAttribute("MÃ¼ller");
 		GenderAttribute gender = new GenderAttribute(GenderType.Male);
-		GivenNameAttribute givenName = new GivenNameAttribute("Bjørn");
+		GivenNameAttribute givenName = new GivenNameAttribute("BjÃ¸rn");
 		PersonIdentifierAttribute pi = new PersonIdentifierAttribute("test12321");
-		PlaceOfBirthAttribute pob = new PlaceOfBirthAttribute("Saint-Étienne, France");		
+		PlaceOfBirthAttribute pob = new PlaceOfBirthAttribute("Saint-Ã‰tienne, France");		
 		ArrayList<EidasAttribute> _att = new ArrayList<EidasAttribute>();
 		_att.add(birthName);
 		_att.add(currentAddress);
