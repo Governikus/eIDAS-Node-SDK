@@ -54,13 +54,13 @@ public enum EidasLegalPersonAttributes implements EidasPersonAttributes {
         ATTRIBUTE_CLASS = attrClazz;
     }
 
-    public static EidasLegalPersonAttributes GetValueOf(String s) {
+    public static EidasLegalPersonAttributes GetValueOf(String s) throws ErrorCodeException {
         for (EidasLegalPersonAttributes elpa : EidasLegalPersonAttributes.values()) {
             if (elpa.NAME.equals(s)) {
                 return elpa;
             }
         }
-        return null;
+		throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Unsupported loa value:" + s);
     }
 
     /**

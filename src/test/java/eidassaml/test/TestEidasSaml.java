@@ -1,14 +1,11 @@
 package eidassaml.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyException;
 import java.security.KeyStoreException;
@@ -16,7 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
@@ -30,8 +26,6 @@ import java.util.Map;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import org.bouncycastle.jcajce.provider.keystore.pkcs12.PKCS12KeyStoreSpi;
-import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.opensaml.xml.ConfigurationException;
@@ -61,18 +55,7 @@ import eidassaml.starterkit.EidasSigner;
 import eidassaml.starterkit.ErrorCodeException;
 import eidassaml.starterkit.Utils;
 import eidassaml.starterkit.Utils.X509KeyPair;
-import eidassaml.starterkit.person_attributes.AbstractAttribute;
 import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.EORIAttribute;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.EUIdentifierAttribute;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.LegalAddressAttribute;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.LegalEntityIdentifierAttribute;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.LegalNameAttribute;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.LegalPersonIdentifierAttribute;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.SEEDAttribute;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.SICAttribute;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.TaxReferenceAttribute;
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.VATRegistrationAttribute;
 import eidassaml.starterkit.person_attributes.natural_persons_attribute.BirthNameAttribute;
 import eidassaml.starterkit.person_attributes.natural_persons_attribute.CurrentAddressAttribute;
 import eidassaml.starterkit.person_attributes.natural_persons_attribute.DateOfBirthAttribute;
@@ -95,7 +78,7 @@ public class TestEidasSaml {
 			KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException, ConfigurationException,
 			XMLParserException, UnmarshallingException, MarshallingException, SignatureException,
 			TransformerFactoryConfigurationError, TransformerException, ErrorCodeException {
-		String _issuer = "test issuer";
+		String _issuer = "https://test/";
 		String _destination = "test destination";
 		String _providerName = "test providername";
 		Map<EidasPersonAttributes, Boolean> _requestedAttributes = new HashMap<EidasPersonAttributes, Boolean>();
@@ -131,6 +114,8 @@ public class TestEidasSaml {
 
 		byte[] request = EidasSaml.CreateRequest(_issuer, _destination, _providerName, _signer, _requestedAttributes,
 				_selectorType, _nameIdPolicy, _loa);
+		String resultStr = new String(org.bouncycastle.util.encoders.Base64.encode(request), StandardCharsets.UTF_8);
+		System.out.println(resultStr);
 		EidasRequest result = EidasSaml.ParseRequest(new ByteArrayInputStream(request), authors);
 		assertEquals(_issuer, result.getIssuer());
 		assertEquals(_destination, result.getDestination());
@@ -145,7 +130,7 @@ public class TestEidasSaml {
 	@Test
 	public void requestFromXMLfile() throws IOException, CertificateException, ConfigurationException,
 			XMLParserException, UnmarshallingException, ErrorCodeException {
-		String _issuer = "test issuer";
+		String _issuer = "https://test/";
 		String _destination = "test destination";
 		String _providerName = "test providername";
 		Map<EidasPersonAttributes, Boolean> _requestedAttributes = new HashMap<EidasPersonAttributes, Boolean>();
@@ -157,12 +142,22 @@ public class TestEidasSaml {
 		_requestedAttributes.put(EidasNaturalPersonAttributes.Gender, true);
 		_requestedAttributes.put(EidasNaturalPersonAttributes.PersonIdentifier, true);
 		_requestedAttributes.put(EidasNaturalPersonAttributes.PlaceOfBirth, false);
+		_requestedAttributes.put(EidasLegalPersonAttributes.LegalPersonIdentifier, true);
+		_requestedAttributes.put(EidasLegalPersonAttributes.LegalName, true);
+		_requestedAttributes.put(EidasLegalPersonAttributes.LegalAddress, true);
+		_requestedAttributes.put(EidasLegalPersonAttributes.VATRegistration, true);
+		_requestedAttributes.put(EidasLegalPersonAttributes.TaxReference, true);
+		_requestedAttributes.put(EidasLegalPersonAttributes.D2012_17_EUIdentifier, true);
+		_requestedAttributes.put(EidasLegalPersonAttributes.LEI, true);
+		_requestedAttributes.put(EidasLegalPersonAttributes.EORI, true);
+		_requestedAttributes.put(EidasLegalPersonAttributes.SEED, true);
+		_requestedAttributes.put(EidasLegalPersonAttributes.SIC, true);
 		X509Certificate cert = Utils
 				.readX509Certificate(TestEidasSaml.class.getResourceAsStream("/EidasSignerTest_x509.cer"));
 		List<X509Certificate> authors = new ArrayList<X509Certificate>();
 		authors.add(cert);
 
-		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_290216.xml"));
+		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_07022017.xml"));
 
 		EidasRequest result = EidasSaml.ParseRequest(new ByteArrayInputStream(request), authors);
 		assertEquals(_issuer, result.getIssuer());
@@ -196,6 +191,7 @@ public class TestEidasSaml {
 		_att.add(pob);		
 		
 		String _destination = "test destination";
+		String destinationMetadata = "test_destination_metadata_url";
 		EidasNameId _nameid = new EidasPersistentNameId("eidasnameidTest");
 		String _issuer = "test issuer";
 		String _inResponseTo = "test inResponseTo";
@@ -207,7 +203,7 @@ public class TestEidasSaml {
 		EidasEncrypter _encrypter = new EidasEncrypter(true, cert[0]);
 		EidasSigner _signer = new EidasSigner(true, pk, cert[0]);
 		
-		byte[] response = EidasSaml.CreateResponse(_att, _destination, _nameid, _issuer, _inResponseTo, _encrypter, _signer);
+		byte[] response = EidasSaml.CreateResponse(_att, _destination, destinationMetadata, _nameid, _issuer, _inResponseTo, _encrypter, _signer);
 		EidasResponse result = EidasSaml.ParseResponse(new ByteArrayInputStream(response), keypair, cert);
 		
 		assertEquals(result.getDestination(),_destination);

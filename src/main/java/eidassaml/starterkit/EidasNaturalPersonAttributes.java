@@ -48,13 +48,13 @@ public enum EidasNaturalPersonAttributes implements EidasPersonAttributes{
 		ATTRIBUTE_CLASS = attrClass;
 	}
 
-	public static EidasNaturalPersonAttributes GetValueOf(String s) {
+	public static EidasNaturalPersonAttributes GetValueOf(String s) throws ErrorCodeException {
 		for (EidasNaturalPersonAttributes enpa : EidasNaturalPersonAttributes.values()) {
 			if (enpa.NAME.equals(s)) {
 				return enpa;
 			}
 		}
-		return null;
+		throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Unsupported EidasNaturalPersonAttributes value:" + s);
 	}
 
 	/**

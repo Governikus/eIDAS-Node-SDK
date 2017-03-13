@@ -21,41 +21,29 @@ package eidassaml.starterkit;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TimeZone;
 
-import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
-import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import org.opensaml.Configuration;
+import org.opensaml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.saml2.core.impl.AuthnRequestMarshaller;
 import org.opensaml.xml.XMLObject;
@@ -65,21 +53,13 @@ import org.opensaml.xml.io.UnmarshallerFactory;
 import org.opensaml.xml.io.UnmarshallingException;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.XMLParserException;
-import org.opensaml.xml.schema.SchemaBuilder;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.signature.Signer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import eidassaml.starterkit.Constants;
-import eidassaml.starterkit.EidasNaturalPersonAttributes;
-import eidassaml.starterkit.EidasSigner;
-import eidassaml.starterkit.Utils;
-import eidassaml.starterkit.XMLSignatureHandler;
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import eidassaml.starterkit.template.TemplateLoader;
 
 /**
@@ -98,6 +78,7 @@ public class EidasRequest {
 	private String issuer;
 	private String issueInstant;
 	private String providerName;
+	private boolean forceAuthn;
 	private EidasRequestSectorType selectorType = EidasRequestSectorType.Public;
 	private EidasNameIdType nameIdPolicy = EidasNameIdType.Transient;
 	private EidasLoA authClassRef = EidasLoA.High;
@@ -117,6 +98,7 @@ public class EidasRequest {
 		signer = _signer;
 		providerName = _providerName;
 		issueInstant = SimpleDf.format(new Date());
+		this.forceAuthn = true;
 	}
 	
 	public EidasRequest(String _destination,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa,String _issuer, String _providerName, EidasSigner _signer) {
@@ -129,6 +111,7 @@ public class EidasRequest {
 		nameIdPolicy = _nameIdPolicy;
 		authClassRef = _loa;
 		issueInstant = SimpleDf.format(new Date());
+		this.forceAuthn = true;
 	}
 	
 	public byte[] generate(Map<EidasPersonAttributes, Boolean> _requestedAttributes) throws IOException, XMLParserException, UnmarshallingException, CertificateEncodingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
@@ -141,6 +124,7 @@ public class EidasRequest {
 		}
 		
 		String template = TemplateLoader.GetTemplateByName("auth");
+		template = template.replace("$ForceAuthn", Boolean.toString(this.forceAuthn));
 		template = template.replace("$Destination", destination);
 		template = template.replace("$Id", id);
 		template = template.replace("$IssuerInstand", issueInstant);
@@ -178,14 +162,24 @@ public class EidasRequest {
 			if (sigs.size() > 0)
 				Signer.signObjects(sigs);
 			
-			Transformer trans = TransformerFactory.newInstance().newTransformer();	      
-		      try(ByteArrayOutputStream bout = new ByteArrayOutputStream()){
-		    	  trans.transform(new DOMSource(all), new StreamResult(bout));
-		    	  returnvalue = bout.toByteArray();
-		      }
+			Transformer trans = TransformerFactory.newInstance().newTransformer();
+			trans.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
+			try(ByteArrayOutputStream bout = new ByteArrayOutputStream()){
+				trans.transform(new DOMSource(all), new StreamResult(bout));
+				returnvalue = bout.toByteArray();
+			}
 		}
 		
 		return returnvalue;
+	}
+	
+	
+	public void setIsForceAuthn(Boolean forceAuthn) {
+		this.forceAuthn = forceAuthn;
+	}
+	
+	public boolean isForceAuthn() {
+		return this.forceAuthn;
 	}
 	
 	public String getId() {
@@ -271,15 +265,24 @@ public class EidasRequest {
 		{
 			CheckSignature(eidasReq.request.getSignature(),authors);
 		}
-				
+		
+		//forceAuthn MUST be true
+		if (eidasReq.request.isForceAuthn()) {
+			eidasReq.setIsForceAuthn(eidasReq.request.isForceAuthn());
+		}
+		else {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Unsupported ForceAuthn value:" + eidasReq.request.isForceAuthn());
+		}
+		
 		eidasReq.id = eidasReq.request.getID();
-		eidasReq.request.getRequestedAuthnContext().getAuthnContextClassRefs().forEach((ref) ->{
-			EidasLoA loa = EidasLoA.GetValueOf(ref.getDOM().getTextContent());
-			if(loa != null)
-			{
-				eidasReq.authClassRef = loa;
-			}
-		});
+		//there should be one AuthnContextClassRef
+		AuthnContextClassRef ref = eidasReq.request.getRequestedAuthnContext().getAuthnContextClassRefs().get(0);
+		if (null != ref) {
+			eidasReq.authClassRef = EidasLoA.GetValueOf(ref.getDOM().getTextContent());
+		}
+		else {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "No AuthnContextClassRef element.");
+		}		
 		String namiIdformat = eidasReq.request.getNameIDPolicy().getFormat();
 		eidasReq.nameIdPolicy = EidasNameIdType.GetValueOf(namiIdformat);		
 
@@ -295,8 +298,11 @@ public class EidasRequest {
 				for ( XMLObject attribute : extension.getOrderedChildren() )
 			    {
 					Element el = attribute.getDOM();
-					EidasPersonAttributes eidasPersonAttributes = EidasNaturalPersonAttributes.GetValueOf(el.getAttribute("Name"));
-					if(eidasPersonAttributes == null){ /* Legal variant? */
+					EidasPersonAttributes eidasPersonAttributes = null;
+					try {
+						eidasPersonAttributes = EidasNaturalPersonAttributes.GetValueOf(el.getAttribute("Name"));
+					}
+					catch (ErrorCodeException e) {
 						eidasPersonAttributes = EidasLegalPersonAttributes.GetValueOf(el.getAttribute("Name"));
 					}
 					eidasReq.requestedAttributes.put(

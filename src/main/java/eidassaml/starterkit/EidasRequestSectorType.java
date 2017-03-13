@@ -36,17 +36,18 @@ public enum EidasRequestSectorType {
 		NAME = name;
 	}
 	
-	public static EidasRequestSectorType GetValueOf(String s)
+	public static EidasRequestSectorType GetValueOf(String s) throws ErrorCodeException
 	{
 		if(Public.NAME.equals(s)){
 			return Public;
 		}
 				
-		if(Private.NAME.equals(s)){
+		else if(Private.NAME.equals(s)){
 			return Private;
 		}
-		
-		return null;
+		else {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Unsupported RequestSectorType value:" + s);
+		}
 	}
 	
 }
