@@ -26,14 +26,12 @@ import java.io.InputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -41,11 +39,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 import org.opensaml.Configuration;
-import org.opensaml.saml2.core.impl.AuthnRequestMarshaller;
 import org.opensaml.saml2.metadata.EntityDescriptor;
-import org.opensaml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.saml2.metadata.KeyDescriptor;
 import org.opensaml.saml2.metadata.SPSSODescriptor;
 import org.opensaml.saml2.metadata.impl.EntityDescriptorMarshaller;
@@ -60,15 +55,12 @@ import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.signature.Signer;
 import org.opensaml.xml.signature.X509Data;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import eidassaml.starterkit.Constants;
-import eidassaml.starterkit.EidasNaturalPersonAttributes;
-import eidassaml.starterkit.EidasSigner;
-import eidassaml.starterkit.XMLSignatureHandler;
 import eidassaml.starterkit.template.TemplateLoader;
 
 /**
@@ -281,7 +273,8 @@ public class EidasMetadataNode {
 			if (sigs.size() > 0)
 				Signer.signObjects(sigs);
 			
-			Transformer trans = TransformerFactory.newInstance().newTransformer();	      
+			Transformer trans = TransformerFactory.newInstance().newTransformer();
+			trans.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
 		      try(ByteArrayOutputStream bout = new ByteArrayOutputStream()){
 		    	  trans.transform(new DOMSource(all), new StreamResult(bout));
 		    	  result = bout.toByteArray();
@@ -300,8 +293,10 @@ public class EidasMetadataNode {
 	 * @throws UnmarshallingException
 	 * @throws CertificateException
 	 * @throws IOException
+	 * @throws ErrorCodeException 
+	 * @throws DOMException 
 	 */
-	public static EidasMetadataNode Parse(InputStream is) throws XMLParserException, UnmarshallingException, CertificateException, IOException
+	public static EidasMetadataNode Parse(InputStream is) throws XMLParserException, UnmarshallingException, CertificateException, IOException, DOMException, ErrorCodeException
 	{
 		EidasMetadataNode eidasMetadataService = new EidasMetadataNode();
 		BasicParserPool ppMgr = new BasicParserPool();

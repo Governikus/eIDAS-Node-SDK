@@ -4,7 +4,7 @@
     ID="$Id" IssueInstant="$IssuerInstand" Version="2.0"
     xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:eidas="http://eidas.europa.eu/saml-extensions" 
     ProviderName="$ProviderName"
-    ForceAuthn="true">
+    ForceAuthn="$ForceAuthn">
     <saml2:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
         xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
         >$Issuer</saml2:Issuer>

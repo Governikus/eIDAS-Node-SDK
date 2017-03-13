@@ -26,27 +26,20 @@ import java.io.InputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
-import javax.xml.crypto.dsig.XMLObject;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 import org.opensaml.Configuration;
-import org.opensaml.common.SAMLObject;
-import org.opensaml.saml2.core.impl.AuthnRequestMarshaller;
 import org.opensaml.saml2.metadata.ContactPerson;
 import org.opensaml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml2.metadata.IDPSSODescriptor;
@@ -68,12 +61,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sun.corba.se.impl.orbutil.graph.Node;
-
-import eidassaml.starterkit.Constants;
-import eidassaml.starterkit.EidasNaturalPersonAttributes;
-import eidassaml.starterkit.EidasSigner;
-import eidassaml.starterkit.XMLSignatureHandler;
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import eidassaml.starterkit.template.TemplateLoader;
 
 /**
@@ -268,7 +256,8 @@ public class EidasMetadataService {
 			if (sigs.size() > 0)
 				Signer.signObjects(sigs);
 			
-			Transformer trans = TransformerFactory.newInstance().newTransformer();	      
+			Transformer trans = TransformerFactory.newInstance().newTransformer();
+			trans.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
 		      try(ByteArrayOutputStream bout = new ByteArrayOutputStream()){
 		    	  trans.transform(new DOMSource(all), new StreamResult(bout));
 		    	  result = bout.toByteArray();
@@ -306,10 +295,17 @@ public class EidasMetadataService {
 		});
 		List<EidasPersonAttributes> attributes = new ArrayList<>();
 		idpssoDescriptor.getAttributes().forEach(a->{
-			EidasPersonAttributes eidasPersonAttributes = EidasNaturalPersonAttributes.GetValueOf(a.getName());
-			if(eidasPersonAttributes==null) { // Legal?
-				eidasPersonAttributes = EidasLegalPersonAttributes.GetValueOf(a.getName());
+			EidasPersonAttributes eidasPersonAttributes = null;
+			try {
+				eidasPersonAttributes = EidasNaturalPersonAttributes.GetValueOf(a.getName());
+			} catch (Exception e1) { //legal person?
+				try {
+					eidasPersonAttributes = EidasLegalPersonAttributes.GetValueOf(a.getName());
+				} catch (Exception e) { //no natural and no legal
+					//ignore error, perhaps log?
+				}
 			}
+			
 			attributes.add(eidasPersonAttributes);
 		});
 		eidasMetadataService.setAttributes(attributes);

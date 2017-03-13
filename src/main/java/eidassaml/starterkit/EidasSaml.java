@@ -21,7 +21,6 @@ package eidassaml.starterkit;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -32,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamSource;
@@ -40,7 +38,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
@@ -51,9 +48,11 @@ import org.opensaml.xml.parse.XMLParserException;
 import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.validation.ValidationException;
 import org.opensaml.xml.validation.ValidatorSuite;
+import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import eidassaml.starterkit.Utils.X509KeyPair;
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import eidassaml.starterkit.template.TemplateLoader;
 
 /**
@@ -202,6 +201,7 @@ public class EidasSaml {
 	 * 
 	 * @param _att the values of the requested attributes
 	 * @param _destination the response destination
+	 * @param metadataDestination the response destination metadata URL
 	 * @param _nameid defines the treatment of identifiers to be used in a cross-border context
 	 * @param _issuer the name of the response sender 
 	 * @param _inResponseTo the responceTo id
@@ -219,10 +219,10 @@ public class EidasSaml {
 	 * @throws TransformerFactoryConfigurationError thrown if there any problem to create the message
 	 * @throws TransformerException thrown if there any problem to create the message
 	 */
-	public static byte[] CreateResponse(ArrayList<EidasAttribute> _att, String _destination, EidasNameId _nameid, String _issuer, String _inResponseTo, EidasEncrypter _encrypter,EidasSigner _signer) throws ConfigurationException, CertificateEncodingException, XMLParserException, IOException, UnmarshallingException, EncryptionException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
+	public static byte[] CreateResponse(ArrayList<EidasAttribute> _att, String _destination, String metadataDestination, EidasNameId _nameid, String _issuer, String _inResponseTo, EidasEncrypter _encrypter,EidasSigner _signer) throws ConfigurationException, CertificateEncodingException, XMLParserException, IOException, UnmarshallingException, EncryptionException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
 	{
 		Init();
-		EidasResponse response = new EidasResponse(_att, _destination, _nameid,_inResponseTo, _issuer, _signer, _encrypter);
+		EidasResponse response = new EidasResponse(_att, _destination, metadataDestination, _nameid,_inResponseTo, _issuer, _signer, _encrypter);
 		return response.generate();	
 	}
 	
@@ -360,8 +360,10 @@ public class EidasSaml {
 	 * @throws XMLParserException
 	 * @throws UnmarshallingException
 	 * @throws IOException
+	 * @throws ErrorCodeException 
+	 * @throws DOMException 
 	 */
-	public static EidasMetadataNode ParseMetaDataNode(InputStream is) throws ConfigurationException, CertificateException, XMLParserException, UnmarshallingException, IOException
+	public static EidasMetadataNode ParseMetaDataNode(InputStream is) throws ConfigurationException, CertificateException, XMLParserException, UnmarshallingException, IOException, DOMException, ErrorCodeException
 	{
 		Init();
 		return EidasMetadataNode.Parse(is);

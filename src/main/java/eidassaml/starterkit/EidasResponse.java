@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -38,8 +39,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
-import eidassaml.starterkit.person_attributes.natural_persons_attribute.*;
 import org.opensaml.Configuration;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Attribute;
@@ -66,10 +65,9 @@ import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.signature.Signer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import eidassaml.starterkit.person_attributes.AbstractAttribute;
-import eidassaml.starterkit.person_attributes.natural_persons_attribute.PersonIdentifierAttribute;
+import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 import eidassaml.starterkit.template.TemplateLoader;
 
 /**
@@ -84,6 +82,7 @@ public class EidasResponse {
 	
 	private String id;
 	private String destination;
+	private String metadataDestination;
 	private String issuer;
 	private String inResponseTo;
 	private String issueInstant;
@@ -116,7 +115,7 @@ public class EidasResponse {
 		attributes = new ArrayList<EidasAttribute>();
 	}
 	
-	public EidasResponse(ArrayList<EidasAttribute> att, String _destination, EidasNameId _nameid,
+	public EidasResponse(ArrayList<EidasAttribute> att, String _destination, String metadataDestination, EidasNameId _nameid,
 			String _inResponseTo, 
 			String _issuer, 
 			EidasSigner _signer,
@@ -124,6 +123,7 @@ public class EidasResponse {
 		id = "_" + Utils.GenerateUniqueID();
 		nameId = _nameid;
 		destination = _destination;
+		this.metadataDestination = metadataDestination;
 		inResponseTo = _inResponseTo;
 		issuer = _issuer;
 		issueInstant = SimpleDf.format(new Date());
@@ -183,6 +183,7 @@ public class EidasResponse {
 
 		      openSamlResp = resp;
 		      Transformer trans = TransformerFactory.newInstance().newTransformer();
+		      trans.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
 		      // Please note: you cannot format the output without breaking signature!		      
 		      try(ByteArrayOutputStream bout = new ByteArrayOutputStream()){
 		    	  trans.transform(new DOMSource(all), new StreamResult(bout));
@@ -221,7 +222,7 @@ public class EidasResponse {
 		assoTemp = assoTemp.replace("$NameFormat", nameId.getType().NAME);
 		assoTemp = assoTemp.replace("$NameID", nameId.getValue());
 		assoTemp = assoTemp.replace("$AssertionId", "_" + Utils.GenerateUniqueID());
-		assoTemp = assoTemp.replace("$Recipient", destination);
+		assoTemp = assoTemp.replace("$Recipient", metadataDestination);
 		assoTemp = assoTemp.replace("$AuthnInstant", issueInstant);
 		assoTemp = assoTemp.replace("$SessionIndex","_" + Utils.GenerateUniqueID());
 		assoTemp = assoTemp.replace("$attributes",attributeString.toString());
@@ -294,6 +295,7 @@ public class EidasResponse {
 
 		      openSamlResp = resp;
 		      Transformer trans = TransformerFactory.newInstance().newTransformer();
+		      trans.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
 		      // Please note: you cannot format the output without breaking signature!		      
 		      try(ByteArrayOutputStream bout = new ByteArrayOutputStream()){
 		    	  trans.transform(new DOMSource(all), new StreamResult(bout));
@@ -448,14 +450,19 @@ public class EidasResponse {
 					}
 					XMLObject attributeValue = att.getAttributeValues().get(0); //IN EIDAS there is just one value except familyname!
 					Element domElement = attributeValue.getDOM();
-
+					EidasPersonAttributes personAttributes;
                     /* Get Person Attribute from the DOM */
-					EidasPersonAttributes personAttributes = EidasNaturalPersonAttributes.GetValueOf(att.getName());
-					if(personAttributes == null){
-						personAttributes = EidasLegalPersonAttributes.GetValueOf(att.getName());
+					try {
+						personAttributes = EidasNaturalPersonAttributes.GetValueOf(att.getName());
 					}
-					if(personAttributes == null){
-						throw new IllegalArgumentException("No attribute known with name: " + att.getName());
+					catch (ErrorCodeException e1) {
+						try {
+							personAttributes = EidasLegalPersonAttributes.GetValueOf(att.getName());
+						}
+						catch (ErrorCodeException e2) {
+							throw new IllegalArgumentException("No attribute known with name: " + att.getName());
+						}
+						
 					}
 
 					EidasAttribute eidasAttribute = personAttributes.getInstance();
@@ -479,11 +486,28 @@ public class EidasResponse {
 		eidasResp.inResponseTo = resp.getInResponseTo();
 		eidasResp.issueInstant = SimpleDf.format(resp.getIssueInstant().toDate());
 		eidasResp.issuer = resp.getIssuer().getDOM().getTextContent();
-		
+		eidasResp.metadataDestination = getAudience(resp);
 		eidasResp.openSamlResp = resp;
 		
 		
 		return eidasResp;
+	}
+	
+	private static String getAudience(org.opensaml.saml2.core.Response resp) throws ErrorCodeException {
+		return resp.getAssertions()
+			.stream()
+			.findFirst()
+			.orElseThrow(() -> new ErrorCodeException(ErrorCode.ERROR, "Missing Assertion in response."))
+			.getConditions()
+			.getAudienceRestrictions()
+			.stream()
+			.findFirst()
+			.orElseThrow(() -> new ErrorCodeException(ErrorCode.ERROR, "Missing AudienceRestrictions in response."))
+			.getAudiences()
+			.stream()
+			.findFirst()
+			.orElseThrow(() -> new ErrorCodeException(ErrorCode.ERROR, "Missing Audiences in response."))
+			.getAudienceURI();
 	}
 	
 	

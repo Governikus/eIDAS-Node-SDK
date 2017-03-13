@@ -49,21 +49,22 @@ public enum EidasLoA {
 		NAME = name;
 	}
 	
-	public static EidasLoA GetValueOf(String s)
+	public static EidasLoA GetValueOf(String s) throws ErrorCodeException
 	{
 		if(Low.NAME.equals(s)){
 			return Low;
 		}
 				
-		if(Substantial.NAME.equals(s)){
+		else if(Substantial.NAME.equals(s)){
 			return Substantial;
 		}
 		
-		if(High.NAME.equals(s)){
+		else if(High.NAME.equals(s)){
 			return High;
 		}
-		
-		return null;
+		else {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Unsupported loa value:" + s);
+		}
 	}
 	
 }

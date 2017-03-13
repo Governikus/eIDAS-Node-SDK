@@ -31,21 +31,22 @@ public enum EidasNameIdType {
 		NAME = name;
 	}
 	
-	public static EidasNameIdType GetValueOf(String s)
+	public static EidasNameIdType GetValueOf(String s) throws ErrorCodeException
 	{
 		if(Persistent.NAME.equals(s)){
 			return Persistent;
 		}
 				
-		if(Transient.NAME.equals(s)){
+		else if(Transient.NAME.equals(s)){
 			return Transient;
 		}
 		
-		if(Unspecified.NAME.equals(s)){
+		else if(Unspecified.NAME.equals(s)){
 			return Unspecified;
 		}
-		
-		return null;
+		else {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Unsupported NameIdType value:" + s);
+		}
 	}
 	
 }
