@@ -428,7 +428,9 @@ public class EidasResponse {
 		
 		for ( Assertion assertion : assertions )
 	    {
-	        CheckSignature(assertion.getSignature(),trustedAnchorList);
+			if (null != assertion.getSignature()) { //signature in assertion may be null
+				CheckSignature(assertion.getSignature(),trustedAnchorList);
+			}
 	        if(eidasResp.nameId == null)
 	        {
 	        	EidasNameIdType type = EidasNameIdType.GetValueOf(assertion.getSubject().getNameID().getFormat());
@@ -514,7 +516,7 @@ public class EidasResponse {
 	private static void CheckSignature(Signature sig, List<X509Certificate> trustedAnchorList) throws ErrorCodeException
 	{
 		if(sig == null)
-			return;
+			throw new ErrorCodeException(ErrorCode.SIGNATURE_CHECK_FAILED);
 		
 		
 		

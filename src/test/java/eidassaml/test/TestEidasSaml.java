@@ -204,6 +204,8 @@ public class TestEidasSaml {
 		EidasSigner _signer = new EidasSigner(true, pk, cert[0]);
 		
 		byte[] response = EidasSaml.CreateResponse(_att, _destination, destinationMetadata, _nameid, _issuer, _inResponseTo, _encrypter, _signer);
+		System.out.println("-->>Response-->>" + new String(response));
+		
 		EidasResponse result = EidasSaml.ParseResponse(new ByteArrayInputStream(response), keypair, cert);
 		
 		assertEquals(result.getDestination(),_destination);

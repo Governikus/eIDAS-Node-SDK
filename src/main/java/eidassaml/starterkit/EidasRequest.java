@@ -322,7 +322,7 @@ public class EidasRequest {
 	private static void CheckSignature(Signature sig, List<X509Certificate> trustedAnchorList) throws ErrorCodeException
 	{
 		if(sig == null)
-			return;
+			throw new ErrorCodeException(ErrorCode.SIGNATURE_CHECK_FAILED);
 		
 	    XMLSignatureHandler.checkSignature(sig,
 	                                       trustedAnchorList.toArray(new X509Certificate[trustedAnchorList.size()]));
