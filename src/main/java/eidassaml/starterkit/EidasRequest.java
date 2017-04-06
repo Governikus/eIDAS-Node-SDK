@@ -309,7 +309,13 @@ public class EidasRequest {
 		eidasReq.issueInstant = SimpleDf.format(eidasReq.request.getIssueInstant().toDate());
 		eidasReq.issuer = eidasReq.request.getIssuer().getDOM().getTextContent();
 		eidasReq.destination = eidasReq.request.getDestination();
-		eidasReq.providerName = eidasReq.request.getProviderName();
+		
+		if (null != eidasReq.request.getProviderName() && !eidasReq.request.getProviderName().isEmpty()) {
+			eidasReq.providerName = eidasReq.request.getProviderName();
+		}
+		else {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "No providerName attribute.");
+		}
 		
 		eidasReq.selectorType = null; 
 		for ( XMLObject extension : eidasReq.request.getExtensions().getOrderedChildren() )
