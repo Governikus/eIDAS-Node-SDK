@@ -157,7 +157,7 @@ public class TestEidasSaml {
 		List<X509Certificate> authors = new ArrayList<X509Certificate>();
 		authors.add(cert);
 
-		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_07022017.xml"));
+		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_06042017.xml"));
 
 		EidasRequest result = EidasSaml.ParseRequest(new ByteArrayInputStream(request), authors);
 		assertEquals(_issuer, result.getIssuer());
@@ -224,6 +224,7 @@ public class TestEidasSaml {
 		String id = "test id";
 		String entityId = "test entityid";
 		Date validUntil = new SimpleDateFormat("dd.MM.yyyy").parse("01.01.2025");
+		EidasLoA highestSupportedLoA = EidasLoA.Substantial;
 		X509Certificate sigCert = Utils
 				.readX509Certificate(TestEidasSaml.class.getResourceAsStream("/EidasSignerTest_x509.cer"));
 		X509Certificate encCert = Utils
@@ -250,7 +251,7 @@ public class TestEidasSaml {
 				"123456".toCharArray())).getKey();
 		EidasSigner signer = new EidasSigner(pk, sigCert);
 
-		byte[] mds = EidasSaml.CreateMetaDataService(id, entityId, validUntil, sigCert, encCert, organisation,
+		byte[] mds = EidasSaml.CreateMetaDataService(id, entityId, validUntil, highestSupportedLoA, sigCert, encCert, organisation,
 					technicalcontact, supportContact, postEndpoint, redirectEndpoint, supportedNameIdTypes, attributes,
 					signer);
 		EidasMetadataService emds = EidasSaml.ParseMetaDataService(new ByteArrayInputStream(mds));

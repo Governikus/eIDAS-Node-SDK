@@ -279,7 +279,7 @@ public class EidasRequest {
 		}
 		
 		//isPassive SHOULD be false
-		if (eidasReq.request.isPassive()) {
+		if (!eidasReq.request.isPassive()) {
 			eidasReq.setPassive(eidasReq.request.isPassive());
 		}
 		else {
