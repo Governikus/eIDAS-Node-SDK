@@ -79,6 +79,7 @@ public class EidasRequest {
 	private String issueInstant;
 	private String providerName;
 	private boolean forceAuthn;
+	private boolean isPassive;
 	private EidasRequestSectorType selectorType = EidasRequestSectorType.Public;
 	private EidasNameIdType nameIdPolicy = EidasNameIdType.Transient;
 	private EidasLoA authClassRef = EidasLoA.High;
@@ -99,6 +100,7 @@ public class EidasRequest {
 		providerName = _providerName;
 		issueInstant = SimpleDf.format(new Date());
 		this.forceAuthn = true;
+		this.isPassive = false;
 	}
 	
 	public EidasRequest(String _destination,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa,String _issuer, String _providerName, EidasSigner _signer) {
@@ -112,6 +114,7 @@ public class EidasRequest {
 		authClassRef = _loa;
 		issueInstant = SimpleDf.format(new Date());
 		this.forceAuthn = true;
+		this.isPassive = false;
 	}
 	
 	public byte[] generate(Map<EidasPersonAttributes, Boolean> _requestedAttributes) throws IOException, XMLParserException, UnmarshallingException, CertificateEncodingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
@@ -125,6 +128,7 @@ public class EidasRequest {
 		
 		String template = TemplateLoader.GetTemplateByName("auth");
 		template = template.replace("$ForceAuthn", Boolean.toString(this.forceAuthn));
+		template = template.replace("$IsPassive", Boolean.toString(this.isPassive));
 		template = template.replace("$Destination", destination);
 		template = template.replace("$Id", id);
 		template = template.replace("$IssuerInstand", issueInstant);
@@ -133,6 +137,7 @@ public class EidasRequest {
 		template = template.replace("$requestAttributes", attributesBuilder.toString());
 		template = template.replace("$NameIDPolicy",nameIdPolicy.NAME);
 		template = template.replace("$AuthClassRef",authClassRef.NAME);
+		
 		if (null != selectorType) {
 			template = template.replace("$SPType","<eidas:SPType>" + selectorType.NAME + "</eidas:SPType>");
 		}
@@ -172,8 +177,15 @@ public class EidasRequest {
 		
 		return returnvalue;
 	}
-	
-	
+		
+	public boolean isPassive() {
+		return isPassive;
+	}
+
+	public void setPassive(boolean isPassive) {
+		this.isPassive = isPassive;
+	}
+
 	public void setIsForceAuthn(Boolean forceAuthn) {
 		this.forceAuthn = forceAuthn;
 	}
@@ -264,6 +276,14 @@ public class EidasRequest {
 		if(authors != null)
 		{
 			CheckSignature(eidasReq.request.getSignature(),authors);
+		}
+		
+		//isPassive SHOULD be false
+		if (eidasReq.request.isPassive()) {
+			eidasReq.setPassive(eidasReq.request.isPassive());
+		}
+		else {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Unsupported IsPassive value:" + eidasReq.request.isPassive());
 		}
 		
 		//forceAuthn MUST be true
