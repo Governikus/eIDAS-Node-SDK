@@ -27,6 +27,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +73,12 @@ public class EidasRequest {
 	
 	private final static String attributeTemplate = "<eidas:RequestedAttribute Name=\"$NAME\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" isRequired=\"$ISREQ\"/>";
 	public final static SimpleDateFormat SimpleDf = Constants.SimpleSamlDf;
+	
+	private final static List<EidasNaturalPersonAttributes> MINIMUM_DATASET = Arrays.asList(new EidasNaturalPersonAttributes[] {
+			EidasNaturalPersonAttributes.PersonIdentifier, 
+			EidasNaturalPersonAttributes.FamilyName, 
+			EidasNaturalPersonAttributes.FirstName, 
+			EidasNaturalPersonAttributes.DateOfBirth});
 	
 	private String id;
 	private String destination;
@@ -338,11 +345,11 @@ public class EidasRequest {
 			}else if("SPType".equals(extension.getElementQName().getLocalPart())){
 				eidasReq.selectorType = EidasRequestSectorType.GetValueOf(extension.getDOM().getTextContent());
 			}
-			
-			
 	    }
+		if (!containsMinimumDataSet(eidasReq.requestedAttributes)) {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Request does not contain minimum dataset.");
+		}
 		return eidasReq;
-		
 	}
 	
 	private static void CheckSignature(Signature sig, List<X509Certificate> trustedAnchorList) throws ErrorCodeException
@@ -356,6 +363,15 @@ public class EidasRequest {
 	    
 	 }
 	
+	private static boolean containsMinimumDataSet(Map<EidasPersonAttributes, Boolean> requestedAttributes) {
+		if (null != requestedAttributes) {
+			return MINIMUM_DATASET.stream()
+					.allMatch(p->requestedAttributes.containsKey(p));
+		}
+		else {
+			return false;
+		}
+	}
 	
 
 }
