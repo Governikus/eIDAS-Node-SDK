@@ -109,6 +109,16 @@ public class EidasRequest {
 		this.forceAuthn = true;
 		this.isPassive = false;
 	}
+
+	public EidasRequest(String _destination, String _issuer, String _providerName, EidasSigner _signer, String _id) {
+		id = _id;
+		destination = _destination;
+		issuer = _issuer;
+		signer = _signer;
+		providerName = _providerName;
+		issueInstant = SimpleDf.format(new Date());
+		this.forceAuthn = true;
+	}
 	
 	public EidasRequest(String _destination,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa,String _issuer, String _providerName, EidasSigner _signer) {
 		id = "_" + Utils.GenerateUniqueID();
