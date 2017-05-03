@@ -27,6 +27,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -73,12 +74,19 @@ public class EidasRequest {
 	private final static String attributeTemplate = "<eidas:RequestedAttribute Name=\"$NAME\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" isRequired=\"$ISREQ\"/>";
 	public final static SimpleDateFormat SimpleDf = Constants.SimpleSamlDf;
 	
+	private final static List<EidasNaturalPersonAttributes> MINIMUM_DATASET = Arrays.asList(new EidasNaturalPersonAttributes[] {
+			EidasNaturalPersonAttributes.PersonIdentifier, 
+			EidasNaturalPersonAttributes.FamilyName, 
+			EidasNaturalPersonAttributes.FirstName, 
+			EidasNaturalPersonAttributes.DateOfBirth});
+	
 	private String id;
 	private String destination;
 	private String issuer;
 	private String issueInstant;
 	private String providerName;
 	private boolean forceAuthn;
+	private boolean isPassive;
 	private EidasRequestSectorType selectorType = EidasRequestSectorType.Public;
 	private EidasNameIdType nameIdPolicy = EidasNameIdType.Transient;
 	private EidasLoA authClassRef = EidasLoA.High;
@@ -99,6 +107,7 @@ public class EidasRequest {
 		providerName = _providerName;
 		issueInstant = SimpleDf.format(new Date());
 		this.forceAuthn = true;
+		this.isPassive = false;
 	}
 
 	public EidasRequest(String _destination, String _issuer, String _providerName, EidasSigner _signer, String _id) {
@@ -122,6 +131,7 @@ public class EidasRequest {
 		authClassRef = _loa;
 		issueInstant = SimpleDf.format(new Date());
 		this.forceAuthn = true;
+		this.isPassive = false;
 	}
 	
 	public byte[] generate(Map<EidasPersonAttributes, Boolean> _requestedAttributes) throws IOException, XMLParserException, UnmarshallingException, CertificateEncodingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
@@ -135,6 +145,7 @@ public class EidasRequest {
 		
 		String template = TemplateLoader.GetTemplateByName("auth");
 		template = template.replace("$ForceAuthn", Boolean.toString(this.forceAuthn));
+		template = template.replace("$IsPassive", Boolean.toString(this.isPassive));
 		template = template.replace("$Destination", destination);
 		template = template.replace("$Id", id);
 		template = template.replace("$IssuerInstand", issueInstant);
@@ -143,6 +154,7 @@ public class EidasRequest {
 		template = template.replace("$requestAttributes", attributesBuilder.toString());
 		template = template.replace("$NameIDPolicy",nameIdPolicy.NAME);
 		template = template.replace("$AuthClassRef",authClassRef.NAME);
+		
 		if (null != selectorType) {
 			template = template.replace("$SPType","<eidas:SPType>" + selectorType.NAME + "</eidas:SPType>");
 		}
@@ -182,8 +194,15 @@ public class EidasRequest {
 		
 		return returnvalue;
 	}
-	
-	
+		
+	public boolean isPassive() {
+		return isPassive;
+	}
+
+	public void setPassive(boolean isPassive) {
+		this.isPassive = isPassive;
+	}
+
 	public void setIsForceAuthn(Boolean forceAuthn) {
 		this.forceAuthn = forceAuthn;
 	}
@@ -276,6 +295,14 @@ public class EidasRequest {
 			CheckSignature(eidasReq.request.getSignature(),authors);
 		}
 		
+		//isPassive SHOULD be false
+		if (!eidasReq.request.isPassive()) {
+			eidasReq.setPassive(eidasReq.request.isPassive());
+		}
+		else {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Unsupported IsPassive value:" + eidasReq.request.isPassive());
+		}
+		
 		//forceAuthn MUST be true
 		if (eidasReq.request.isForceAuthn()) {
 			eidasReq.setIsForceAuthn(eidasReq.request.isForceAuthn());
@@ -299,7 +326,13 @@ public class EidasRequest {
 		eidasReq.issueInstant = SimpleDf.format(eidasReq.request.getIssueInstant().toDate());
 		eidasReq.issuer = eidasReq.request.getIssuer().getDOM().getTextContent();
 		eidasReq.destination = eidasReq.request.getDestination();
-		eidasReq.providerName = eidasReq.request.getProviderName();
+		
+		if (null != eidasReq.request.getProviderName() && !eidasReq.request.getProviderName().isEmpty()) {
+			eidasReq.providerName = eidasReq.request.getProviderName();
+		}
+		else {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "No providerName attribute.");
+		}
 		
 		eidasReq.selectorType = null; 
 		for ( XMLObject extension : eidasReq.request.getExtensions().getOrderedChildren() )
@@ -322,11 +355,11 @@ public class EidasRequest {
 			}else if("SPType".equals(extension.getElementQName().getLocalPart())){
 				eidasReq.selectorType = EidasRequestSectorType.GetValueOf(extension.getDOM().getTextContent());
 			}
-			
-			
 	    }
+		if (!containsMinimumDataSet(eidasReq.requestedAttributes)) {
+			throw new ErrorCodeException(ErrorCode.ILLEGAL_REQUEST_SYNTAX, "Request does not contain minimum dataset.");
+		}
 		return eidasReq;
-		
 	}
 	
 	private static void CheckSignature(Signature sig, List<X509Certificate> trustedAnchorList) throws ErrorCodeException
@@ -340,6 +373,15 @@ public class EidasRequest {
 	    
 	 }
 	
+	private static boolean containsMinimumDataSet(Map<EidasPersonAttributes, Boolean> requestedAttributes) {
+		if (null != requestedAttributes) {
+			return MINIMUM_DATASET.stream()
+					.allMatch(p->requestedAttributes.containsKey(p));
+		}
+		else {
+			return false;
+		}
+	}
 	
 
 }

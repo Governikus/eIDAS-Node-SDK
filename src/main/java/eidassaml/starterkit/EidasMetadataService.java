@@ -78,6 +78,7 @@ public class EidasMetadataService {
 	private String id;
 	private String entityId;
 	private Date validUntil;
+	private EidasLoA highestSupportedLoA;
 	private X509Certificate sigCert;
 	private X509Certificate encCert;
 	private EidasOrganisation organisation;
@@ -90,7 +91,7 @@ public class EidasMetadataService {
 	
 	private EidasMetadataService(){}
 		
-	public EidasMetadataService(String id, String entityId, Date validUntil,
+	public EidasMetadataService(String id, String entityId, Date validUntil, EidasLoA highestSupportedLoA,
 			X509Certificate sigCert, X509Certificate encCert,
 			EidasOrganisation organisation, EidasContactPerson technicalContact,EidasContactPerson supportContact,
 			String postEndpoint, String redirectEndpoint, List<EidasNameIdType> supportedNameIdTypes) {
@@ -98,6 +99,7 @@ public class EidasMetadataService {
 		this.id = id;
 		this.entityId = entityId;
 		this.validUntil = validUntil;
+		this.highestSupportedLoA = highestSupportedLoA;
 		this.sigCert = sigCert;
 		this.encCert = encCert;
 		this.organisation = organisation;
@@ -200,6 +202,8 @@ public class EidasMetadataService {
 		template=template.replace("$Id", id);
 		template=template.replace("$entityID", entityId);
 		template=template.replace("$validUntil", Constants.SimpleSamlDf.format(validUntil));
+		template=template.replace("$highestSupportedLoA", this.highestSupportedLoA.NAME);
+		
 		template=template.replace("$signCert", 
 				new String(Base64.encodeBase64(sigCert.getEncoded(), false),Constants.UTF8_CHARSET)
 				);
