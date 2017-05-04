@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"   xmlns:alg="urn:oasis:names:tc:SAML:2.0:metadata:algsupport"
-    xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" 
+    xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
     ID="$Id"
         entityID="$entityID"
         validUntil="$validUntil">
-    <md:Extensions>    
+    <md:Extensions>
+    	<mdattr:EntityAttributes xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute">
+    		<saml2:Attribute xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" 
+    			Name="urn:oasis:names:tc:SAML:attribute:assurance-certification" 
+    			NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+    			<saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">$highestSupportedLoA</saml2:AttributeValue>
+    		</saml2:Attribute>
+    	</mdattr:EntityAttributes>   
         <alg:DigestMethod  Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
         <alg:SigningMethod MinKeySize="256" Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
         <alg:SigningMethod MinKeySize="3072" MaxKeySize="4096"  Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>                

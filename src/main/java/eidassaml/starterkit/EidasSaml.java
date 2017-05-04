@@ -305,9 +305,9 @@ public class EidasSaml {
 	 * @throws TransformerFactoryConfigurationError
 	 * @throws TransformerException
 	 */
-	public static byte[] CreateMetaDataService(String id, String entityId, Date validUntil, X509Certificate sigCert, X509Certificate encCert, EidasOrganisation organisation, EidasContactPerson technicalcontact, EidasContactPerson supportContact, String postEndpoint, String redirectEndpoint, List<EidasNameIdType> supportedNameIdTypes, List<EidasPersonAttributes> attributes, EidasSigner signer) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
+	public static byte[] CreateMetaDataService(String id, String entityId, Date validUntil, EidasLoA highestSupportedLoA, X509Certificate sigCert, X509Certificate encCert, EidasOrganisation organisation, EidasContactPerson technicalcontact, EidasContactPerson supportContact, String postEndpoint, String redirectEndpoint, List<EidasNameIdType> supportedNameIdTypes, List<EidasPersonAttributes> attributes, EidasSigner signer) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
 		Init();
-		EidasMetadataService meta = new EidasMetadataService(id, entityId, validUntil, sigCert, encCert, organisation, technicalcontact, supportContact, postEndpoint, redirectEndpoint, supportedNameIdTypes);
+		EidasMetadataService meta = new EidasMetadataService(id, entityId, validUntil, highestSupportedLoA, sigCert, encCert, organisation, technicalcontact, supportContact, postEndpoint, redirectEndpoint, supportedNameIdTypes);
 		return meta.generate(attributes, signer);
 	}
 	
