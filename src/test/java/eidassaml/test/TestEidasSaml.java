@@ -158,7 +158,7 @@ public class TestEidasSaml {
 		authors.add(cert);
 
 
-		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_07022017.xml"));
+		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_06042017.xml"));
 
 
 		EidasRequest result = EidasSaml.ParseRequest(new ByteArrayInputStream(request), authors);
@@ -254,7 +254,7 @@ public class TestEidasSaml {
 		EidasSigner signer = new EidasSigner(pk, sigCert);
 
 
-		byte[] mds = EidasSaml.CreateMetaDataService(id, entityId, validUntil, sigCert, encCert, organisation,
+		byte[] mds = EidasSaml.CreateMetaDataService(id, entityId, validUntil, EidasLoA.Substantial, sigCert, encCert, organisation,
 					technicalcontact, supportContact, postEndpoint, redirectEndpoint, supportedNameIdTypes, attributes,
 					signer);
 		EidasMetadataService emds = EidasSaml.ParseMetaDataService(new ByteArrayInputStream(mds));
