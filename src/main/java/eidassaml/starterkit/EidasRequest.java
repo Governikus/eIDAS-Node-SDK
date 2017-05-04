@@ -43,6 +43,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opensaml.Configuration;
 import org.opensaml.saml2.core.AuthnContextClassRef;
 import org.opensaml.saml2.core.AuthnRequest;
@@ -70,6 +72,7 @@ import eidassaml.starterkit.template.TemplateLoader;
  */
 public class EidasRequest {
 	
+	private static final Log LOG = LogFactory.getLog(EidasRequest.class);
 	
 	private final static String attributeTemplate = "<eidas:RequestedAttribute Name=\"$NAME\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" isRequired=\"$ISREQ\"/>";
 	public final static SimpleDateFormat SimpleDf = Constants.SimpleSamlDf;
@@ -341,16 +344,12 @@ public class EidasRequest {
 				for ( XMLObject attribute : extension.getOrderedChildren() )
 			    {
 					Element el = attribute.getDOM();
-					EidasPersonAttributes eidasPersonAttributes = null;
-					try {
-						eidasPersonAttributes = EidasNaturalPersonAttributes.GetValueOf(el.getAttribute("Name"));
-					}
-					catch (ErrorCodeException e) {
-						eidasPersonAttributes = EidasLegalPersonAttributes.GetValueOf(el.getAttribute("Name"));
-					}
-					eidasReq.requestedAttributes.put(
+					EidasPersonAttributes eidasPersonAttributes = getEidasPersonAttributes(el);
+					if (null != eidasPersonAttributes) {
+						eidasReq.requestedAttributes.put(
 							eidasPersonAttributes,
 							Boolean.parseBoolean(el.getAttribute("isRequired")));
+					}
 			    }
 			}else if("SPType".equals(extension.getElementQName().getLocalPart())){
 				eidasReq.selectorType = EidasRequestSectorType.GetValueOf(extension.getDOM().getTextContent());
@@ -362,6 +361,28 @@ public class EidasRequest {
 		return eidasReq;
 	}
 	
+	/**
+	 * Returns {@link EidasPersonAttributes} enum from given {@link Element}. 
+	 * In case enum can not be found null is returned; unknown attributes should be ignored.
+	 * 
+	 * @param el
+	 * @return
+	 */
+	private static EidasPersonAttributes getEidasPersonAttributes(Element el) {
+		EidasPersonAttributes eidasPersonAttributes = null;
+			try {
+				eidasPersonAttributes = EidasNaturalPersonAttributes.GetValueOf(el.getAttribute("Name"));
+			}
+			catch (ErrorCodeException e) {
+				try {
+					eidasPersonAttributes = EidasLegalPersonAttributes.GetValueOf(el.getAttribute("Name"));
+				} catch (ErrorCodeException e1) {
+					LOG.warn("Attribute " + el.getAttribute("Name") + " not an eIDAS attribute. Ignoring.");
+				}
+			}
+		return eidasPersonAttributes;
+	}
+
 	private static void CheckSignature(Signature sig, List<X509Certificate> trustedAnchorList) throws ErrorCodeException
 	{
 		if(sig == null)
