@@ -137,6 +137,20 @@ public class EidasRequest {
 		this.isPassive = false;
 	}
 	
+	public EidasRequest(String _id, String _destination,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa,String _issuer, String _providerName, EidasSigner _signer) {
+		id = _id;
+		destination = _destination;
+		issuer = _issuer;
+		providerName = _providerName;
+		signer = _signer;
+		selectorType = _selectorType;
+		nameIdPolicy = _nameIdPolicy;
+		authClassRef = _loa;
+		issueInstant = SimpleDf.format(new Date());
+		this.forceAuthn = true;
+		this.isPassive = false;
+	}
+	
 	public byte[] generate(Map<EidasPersonAttributes, Boolean> _requestedAttributes) throws IOException, XMLParserException, UnmarshallingException, CertificateEncodingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException
 	{
 		byte[] returnvalue = null;
