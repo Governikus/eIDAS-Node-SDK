@@ -159,6 +159,12 @@ public class EidasSaml {
 		EidasRequest eidasRequest = new EidasRequest(_destination,_selectorType,_nameIdPolicy,_loa, _issuer,_providerName, _signer);
 		return eidasRequest.generate(_requestedAttributes);
 	}
+
+	public static byte[] CreateRequest(String _id, String _issuer, String _destination,String _providerName, EidasSigner _signer, Map<EidasPersonAttributes, Boolean> _requestedAttributes,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
+		Init();
+		EidasRequest eidasRequest = new EidasRequest(_id, _destination,_selectorType,_nameIdPolicy,_loa, _issuer,_providerName, _signer);
+		return eidasRequest.generate(_requestedAttributes);
+	}
 	
 	public static byte[] CreateRequest(String _issuer, String _destination, EidasSigner _signer, Map<EidasPersonAttributes, Boolean> _requestedAttributes,EidasRequestSectorType _selectorType, EidasNameIdType _nameIdPolicy, EidasLoA _loa) throws ConfigurationException, CertificateEncodingException, IOException, XMLParserException, UnmarshallingException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException{
 		Init();
