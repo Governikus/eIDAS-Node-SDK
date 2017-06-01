@@ -175,7 +175,7 @@ public class TestEidasSaml {
 	@Test
 	public void createParseResponse() throws SAXException, CertificateException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException, KeyException, ConfigurationException, XMLParserException, UnmarshallingException, EncryptionException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException, ErrorCodeException {
 		BirthNameAttribute birthName = new BirthNameAttribute("Meyer");
-		CurrentAddressAttribute currentAddress = new CurrentAddressAttribute("Am Fallturm","33","Bremen","28207");
+		CurrentAddressAttribute currentAddress = new CurrentAddressAttribute("Am Fallturm","33","Bremen","28207", "100", "bla", "bla", "bla", "bla");
 		DateOfBirthAttribute dao = new DateOfBirthAttribute("1982-02-11");
 		FamilyNameAttribute familyName =  new FamilyNameAttribute("Müller");
 		GenderAttribute gender = new GenderAttribute(GenderType.Male);

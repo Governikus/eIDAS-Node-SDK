@@ -38,25 +38,42 @@ import eidassaml.starterkit.template.TemplateLoader;
 
 public class CurrentAddressAttribute implements EidasAttribute{
 
-	protected final static String CVAddressTemp = "<eidas:LocatorDesignator>$locatorDesignator</eidas:LocatorDesignator>"+
-											"<eidas:Thoroughfare>$thoroughfare</eidas:Thoroughfare>"+
-											"<eidas:PostName>$postName</eidas:PostName>"+
-											"<eidas:PostCode>$postCode</eidas:PostCode>";
+	protected final static String CVAddressTemp = "<eidas:LocatorDesignator>$locatorDesignator</eidas:LocatorDesignator>" +
+											"<eidas:Thoroughfare>$thoroughfare</eidas:Thoroughfare>" +
+											"<eidas:PostName>$postName</eidas:PostName>" +
+											"<eidas:PostCode>$postCode</eidas:PostCode>" +
+											"<eidas:PoBox>$pOBOX</eidas:PoBox>" +
+											"<eidas:LocatorName>$locatorName</eidas:LocatorName>" +
+											"<eidas:CvaddressArea>$cvaddressArea</eidas:CvaddressArea>" +
+											"<eidas:AdminunitFirstline>$adminunitFirstline</eidas:AdminunitFirstline>" +
+											"<eidas:AdminunitSecondline>$adminunitSecondline</eidas:AdminunitSecondline>";
 	
 	private String locatorDesignator;
 	private String thoroughfare;
 	private String postName;
 	private String postCode;
+	private String pOBOX;
+	private String locatorName;
+	private String cvaddressArea;
+	private String adminunitSecondline;
+	private String adminunitFirstline;
 
 	public CurrentAddressAttribute(){}
 
 	public CurrentAddressAttribute(String locatorDesignator,
-			String thoroughfare, String postName, String postCode) {
+			String thoroughfare, String postName, String postCode, String pOBOX, String locatorName, String cvaddressArea,
+			String adminunitFirstline, String adminunitSecondline) {
 		super();
 		this.locatorDesignator = locatorDesignator;
 		this.thoroughfare = thoroughfare;
 		this.postName = postName;
 		this.postCode = postCode;
+		this.pOBOX = pOBOX;
+		this.locatorName = locatorName;
+		this.locatorDesignator = locatorDesignator;
+		this.cvaddressArea = cvaddressArea;
+		this.adminunitFirstline = adminunitFirstline;
+		this.adminunitSecondline = adminunitSecondline;
 	}
 	
 	/**
@@ -97,6 +114,12 @@ public class CurrentAddressAttribute implements EidasAttribute{
 			this.thoroughfare = handler.thoroughfare;
 			this.postName = handler.postName;
 			this.postCode = handler.postCode;
+			this.pOBOX = handler.pOBOX;
+			this.locatorName = handler.locatorName;
+			this.locatorDesignator = handler.locatorDesignator;
+			this.cvaddressArea = handler.cvaddressArea;
+			this.adminunitFirstline = handler.adminunitFirstline;
+			this.adminunitSecondline = handler.adminunitSecondline;
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			throw new SAXException(e);
 		}	
@@ -134,13 +157,50 @@ public class CurrentAddressAttribute implements EidasAttribute{
 	public void setPostCode(String postCode) {
 		this.postCode = postCode;
 	}
+	
+	public String getpOBOX() {
+		return pOBOX;
+	}
+
+	public void setpOBOX(String pOBOX) {
+		this.pOBOX = pOBOX;
+	}
+
+	public String getLocatorName() {
+		return locatorName;
+	}
+
+	public void setLocatorName(String locatorName) {
+		this.locatorName = locatorName;
+	}
+
+	public String getCvaddressArea() {
+		return cvaddressArea;
+	}
+
+	public void setCvaddressArea(String cvaddressArea) {
+		this.cvaddressArea = cvaddressArea;
+	}
+
+	public String getAdminunitSecondline() {
+		return adminunitSecondline;
+	}
+
+	public void setAdminunitSecondline(String adminunitSecondline) {
+		this.adminunitSecondline = adminunitSecondline;
+	}
+
+	public String getAdminunitFirstline() {
+		return adminunitFirstline;
+	}
+
+	public void setAdminunitFirstline(String adminunitFirstline) {
+		this.adminunitFirstline = adminunitFirstline;
+	}
 
 	@Override
 	public String generate() {
-		String value = CVAddressTemp.replace("$locatorDesignator", locatorDesignator)
-				.replace("$thoroughfare", thoroughfare)
-				.replace("$postName", postName)
-				.replace("$postCode", postCode);
+		String value = getValue();
 		return TemplateLoader.GetTemplateByName("currentAddress").replace("$value", Utils.ToBase64(value));
 	}
 
@@ -151,7 +211,9 @@ public class CurrentAddressAttribute implements EidasAttribute{
 	
 	@Override
 	public String toString() {
-		return type() + " " + this.locatorDesignator + " " + this.thoroughfare + " , " + this.postCode + " " + this.postName;
+		return type() + " " + this.locatorDesignator + " " + this.thoroughfare + " , " + this.postCode + " " + this.postName
+				+ " " + this.pOBOX + " " + this.locatorName + " " + this.locatorDesignator + " " + 	this.cvaddressArea
+				+ " " + this.adminunitFirstline + " " + this.adminunitSecondline;
 	}
 	
 	@Override
@@ -175,7 +237,12 @@ public class CurrentAddressAttribute implements EidasAttribute{
 		return CVAddressTemp.replace("$locatorDesignator", getLocatorDesignator())
 				.replace("$thoroughfare", getThoroughfare())
 				.replace("$postName", getPostName())
-				.replace("$postCode", getPostCode());
+				.replace("$postCode", getPostCode())
+				.replace("$pOBOX", getpOBOX())
+				.replace("$locatorName", getLocatorName())
+				.replace("$cvaddressArea", getCvaddressArea())
+				.replace("$adminunitFirstline", getAdminunitFirstline())
+				.replace("$adminunitSecondline", getAdminunitSecondline());
 	}
 
 	class AddressAttributeXMLHandler extends DefaultHandler {
@@ -184,6 +251,11 @@ public class CurrentAddressAttribute implements EidasAttribute{
 		private String thoroughfare = "";
 		private String postName = "";
 		private String postCode = "";
+		private String pOBOX = "";
+		private String locatorName = "";
+		private String cvaddressArea = "";
+		private String adminunitSecondline = "";
+		private String adminunitFirstline = "";
 		
 		private String currentQName = "";
 		
@@ -202,12 +274,22 @@ public class CurrentAddressAttribute implements EidasAttribute{
 				return;
 			if(currentQName.contains("locatordesignator")){
 				locatorDesignator = value;return;
-			}else if(currentQName.contains("thoroughfare")){
+			} else if(currentQName.contains("thoroughfare")){
 				thoroughfare = value;return;
-			}else if(currentQName.contains("postname")){
+			} else if(currentQName.contains("postname")){
 				postName = value;return;
-			}else if(currentQName.contains("postcode")){
+			} else if(currentQName.contains("postcode")){
 				postCode = value;return;
+			} else if(currentQName.contains("pobox")){
+				pOBOX = value;return;
+			} else if(currentQName.contains("locatorname")){
+				locatorName = value;return;
+			} else if(currentQName.contains("cvaddressarea")){
+				cvaddressArea = value;return;
+			} else if(currentQName.contains("adminunitsecondline")){
+				adminunitSecondline = value;return;
+			} else if(currentQName.contains("adminunitfirstline")){
+				 adminunitFirstline = value;return;
 			}
 		}	
 	}
