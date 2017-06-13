@@ -27,7 +27,7 @@ public class LegalAddressAttribute extends CurrentAddressAttribute {
     @Override
     public String generate() {
         String value = super.getValue();
-        return TemplateLoader.GetTemplateByName("legalpersonaddress").replace("$value", Utils.ToBase64(value));
+        return TemplateLoader.GetTemplateByName("legalpersonaddress").replace("$base64Value", Utils.ToBase64(value));
     }
 
     @Override

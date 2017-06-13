@@ -115,7 +115,7 @@ public class TestEidasSaml {
 		byte[] request = EidasSaml.CreateRequest(_issuer, _destination, _providerName, _signer, _requestedAttributes,
 				_selectorType, _nameIdPolicy, _loa);
 		String resultStr = new String(org.bouncycastle.util.encoders.Base64.encode(request), StandardCharsets.UTF_8);
-		System.out.println(resultStr);
+		System.out.println("--->" + resultStr);
 		EidasRequest result = EidasSaml.ParseRequest(new ByteArrayInputStream(request), authors);
 		assertEquals(_issuer, result.getIssuer());
 		assertEquals(_destination, result.getDestination());
@@ -158,7 +158,7 @@ public class TestEidasSaml {
 		authors.add(cert);
 
 
-		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_06042017.xml"));
+		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_13062017.xml"));
 
 
 		EidasRequest result = EidasSaml.ParseRequest(new ByteArrayInputStream(request), authors);
