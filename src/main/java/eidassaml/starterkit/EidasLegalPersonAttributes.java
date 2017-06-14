@@ -37,7 +37,7 @@ public enum EidasLegalPersonAttributes implements EidasPersonAttributes {
     LegalName("http://eidas.europa.eu/attributes/legalperson/LegalName", "LegalName", LegalNameAttribute.class),
     LegalAddress("http://eidas.europa.eu/attributes/legalperson/LegalPersonAddress", "LegalAddress", LegalAddressAttribute.class),
     VATRegistration("http://eidas.europa.eu/attributes/legalperson/VATRegistrationNumber", "VATRegistration", VATRegistrationAttribute.class),
-    TaxReference("http://eidas.europa.eu/attributes/legalperson/TaxReferenceType", "TaxReference", TaxReferenceAttribute.class),
+    TaxReference("http://eidas.europa.eu/attributes/legalperson/TaxReference", "TaxReference", TaxReferenceAttribute.class),
     D2012_17_EUIdentifier("http://eidas.europa.eu/attributes/legalperson/D-2012-17-EUIdentifier", "D-2012-17-EUIdentifier", EUIdentifierAttribute.class),
     LEI("http://eidas.europa.eu/attributes/legalperson/LEI", "LEI", LegalEntityIdentifierAttribute.class),
     EORI("http://eidas.europa.eu/attributes/legalperson/EORI", "EORI", EORIAttribute.class),

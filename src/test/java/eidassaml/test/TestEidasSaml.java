@@ -115,7 +115,7 @@ public class TestEidasSaml {
 		byte[] request = EidasSaml.CreateRequest(_issuer, _destination, _providerName, _signer, _requestedAttributes,
 				_selectorType, _nameIdPolicy, _loa);
 		String resultStr = new String(org.bouncycastle.util.encoders.Base64.encode(request), StandardCharsets.UTF_8);
-		System.out.println(resultStr);
+		System.out.println("--->" + resultStr);
 		EidasRequest result = EidasSaml.ParseRequest(new ByteArrayInputStream(request), authors);
 		assertEquals(_issuer, result.getIssuer());
 		assertEquals(_destination, result.getDestination());
@@ -158,7 +158,7 @@ public class TestEidasSaml {
 		authors.add(cert);
 
 
-		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_06042017.xml"));
+		byte[] request = Files.readAllBytes(Paths.get("src/test/resources/EidasSamlRequest_13062017.xml"));
 
 
 		EidasRequest result = EidasSaml.ParseRequest(new ByteArrayInputStream(request), authors);
@@ -175,11 +175,11 @@ public class TestEidasSaml {
 	@Test
 	public void createParseResponse() throws SAXException, CertificateException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException, KeyException, ConfigurationException, XMLParserException, UnmarshallingException, EncryptionException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException, ErrorCodeException {
 		BirthNameAttribute birthName = new BirthNameAttribute("Meyer");
-		CurrentAddressAttribute currentAddress = new CurrentAddressAttribute("Am Fallturm","33","Bremen","28207");
+		CurrentAddressAttribute currentAddress = new CurrentAddressAttribute("Am Fallturm","33","Bremen","28207", "100", "bla", "bla", "bla", "bla");
 		DateOfBirthAttribute dao = new DateOfBirthAttribute("1982-02-11");
-		FamilyNameAttribute familyName =  new FamilyNameAttribute("Müller");
+		FamilyNameAttribute familyName =  new FamilyNameAttribute("Muller", "Müller");
 		GenderAttribute gender = new GenderAttribute(GenderType.Male);
-		GivenNameAttribute givenName = new GivenNameAttribute("Bjørn");
+		GivenNameAttribute givenName = new GivenNameAttribute("Bjorn", "Bjørn");
 		PersonIdentifierAttribute pi = new PersonIdentifierAttribute("test12321");
 		PlaceOfBirthAttribute pob = new PlaceOfBirthAttribute("Saint-Étienne, France");		
 		ArrayList<EidasAttribute> _att = new ArrayList<EidasAttribute>();
@@ -215,7 +215,7 @@ public class TestEidasSaml {
 		assertEquals(result.getIssuer(),_issuer);
 		assertEquals(result.getInResponseTo(),_inResponseTo);
 		for (int i = 0; i < _att.size(); i++){
-			assertEquals(result.getAttributes().get(i).getValue().replaceAll("\\s+",""),_att.get(i).getValue().replaceAll("\\s+",""));
+			assertEquals(result.getAttributes().get(i).getLatinScript().replaceAll("\\s+",""),_att.get(i).getLatinScript().replaceAll("\\s+",""));
 		}
 		
 	}

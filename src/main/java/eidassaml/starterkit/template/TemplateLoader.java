@@ -62,6 +62,8 @@ public class TemplateLoader {
 				map.put("eori", StreamToString(TemplateLoader.class.getResourceAsStream("/template/eori_template.xml")));
 				map.put("legalentityidentifier", StreamToString(TemplateLoader.class.getResourceAsStream("/template/legalentityidentifier_template.xml")));
 				map.put("legalname", StreamToString(TemplateLoader.class.getResourceAsStream("/template/legalname_template.xml")));
+				map.put("legalname_transliterated", StreamToString(TemplateLoader.class.getResourceAsStream("/template/legalname_transliterated_template.xml")));
+				
 				map.put("legalpersonaddress", StreamToString(TemplateLoader.class.getResourceAsStream("/template/legalpersonaddress_template.xml")));
 				map.put("legalpersonidentifier", StreamToString(TemplateLoader.class.getResourceAsStream("/template/legalpersonidentifier_template.xml")));
 				map.put("seed", StreamToString(TemplateLoader.class.getResourceAsStream("/template/seed_template.xml")));

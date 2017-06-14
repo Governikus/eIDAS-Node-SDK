@@ -21,41 +21,39 @@ package eidassaml.starterkit.person_attributes.natural_persons_attribute;
 
 import eidassaml.starterkit.EidasAttribute;
 import eidassaml.starterkit.EidasNaturalPersonAttributes;
-import eidassaml.starterkit.person_attributes.AbstractAttribute;
+import eidassaml.starterkit.Utils;
+import eidassaml.starterkit.person_attributes.AbstractNonLatinScriptAttribute;
 import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
-import eidassaml.starterkit.template.TemplateLoader;
 
-public class BirthNameAttribute extends AbstractAttribute {
+public class BirthNameAttribute extends AbstractNonLatinScriptAttribute {
+	
+	public BirthNameAttribute() {}
 
-	public BirthNameAttribute(){}
 	public BirthNameAttribute(String value) {
 		super(value);
 	}
 
 	@Override
 	public String getTemplateName() {
-		return "birthName";
+		return Utils.IsNullOrEmpty(getLatinScript()) ? "birthName" : "birthName_transliterated";
 	}
 
-	public BirthNameAttribute(String value, String transliteratedValue) {
-		super(value,transliteratedValue);
+	public BirthNameAttribute(String latinScript, String nonLatinScript) {
+		super(latinScript, nonLatinScript);
 	}
 
 	@Override
 	public String type() {
-		// TODO Auto-generated method stub
 		return EidasAttribute.TYPE_BirthName;
 	}
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return type() + " " + getValue();
+		return type() + " " + getNonLatinScript();
 	}
 
 	@Override
 	public EidasPersonAttributes getPersonAttributeType() {
-		// TODO Auto-generated method stub
 		return EidasNaturalPersonAttributes.BirthName;
 	}	
 }

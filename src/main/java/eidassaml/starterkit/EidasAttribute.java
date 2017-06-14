@@ -49,13 +49,13 @@ public interface EidasAttribute {
 	/**
 	 * Set the attribute value
 	 */
-	public void setValue(String value);
+	public void setLatinScript(String value);
 
 	/**
 	 * Get a string-representation of the attribute value
 	 * @return a String containing the attribute value
 	 */
-	public String getValue();
+	public String getLatinScript();
 
 
 	/**
