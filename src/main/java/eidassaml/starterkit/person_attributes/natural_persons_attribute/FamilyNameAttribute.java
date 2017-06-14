@@ -22,15 +22,15 @@ package eidassaml.starterkit.person_attributes.natural_persons_attribute;
 import eidassaml.starterkit.EidasAttribute;
 import eidassaml.starterkit.EidasNaturalPersonAttributes;
 import eidassaml.starterkit.Utils;
-import eidassaml.starterkit.person_attributes.AbstractAttribute;
+import eidassaml.starterkit.person_attributes.AbstractNonLatinScriptAttribute;
 import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 
-public class FamilyNameAttribute extends AbstractAttribute {
+public class FamilyNameAttribute extends AbstractNonLatinScriptAttribute {
 
-	public FamilyNameAttribute(){}
-
-	public FamilyNameAttribute(String value, String transliteratedValue) {
-		super(value,transliteratedValue);
+	public FamilyNameAttribute() {}
+	
+	public FamilyNameAttribute(String latinScript, String nonLatinScript) {
+		super(latinScript, nonLatinScript);
 	}
 	
 	public FamilyNameAttribute(String value) {
@@ -39,24 +39,22 @@ public class FamilyNameAttribute extends AbstractAttribute {
 
 	@Override
 	public String getTemplateName() {
-		return Utils.IsNullOrEmpty(getTransliteratedValue()) ? "familyname" : "familyname_transliterated";
+		return Utils.IsNullOrEmpty(getLatinScript()) ? "familyname" : "familyname_transliterated";
 	}
 
 	@Override
 	public String type() {
-		// TODO Auto-generated method stub
 		return EidasAttribute.TYPE_FamilyName;
 	}
 
 	@Override
 	public EidasPersonAttributes getPersonAttributeType() {
-		// TODO Auto-generated method stub
 		return EidasNaturalPersonAttributes.FamilyName;
 	}
 	
 	@Override
 	public String toString() {
-		return type() + " " + this.getValue();
+		return type() + " " + this.getNonLatinScript();
 	}
 
 }

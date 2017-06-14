@@ -35,7 +35,7 @@ public class GenderAttribute implements EidasAttribute{
 
 	public GenderAttribute(){}
 
-	public String getValue() {
+	public String getNonLatinScript() {
 		return value.NAME;
 	}
 
@@ -55,13 +55,17 @@ public class GenderAttribute implements EidasAttribute{
 	
 	@Override
 	public EidasPersonAttributes getPersonAttributeType() {
-		// TODO Auto-generated method stub
 		return EidasNaturalPersonAttributes.Gender;
 	}
 
 	@Override
-	public void setValue(String value) {
+	public void setLatinScript(String value) {
 		this.value = GenderType.GetValueOf(value);
+	}
+
+	@Override
+	public String getLatinScript() {
+		return this.value.name();
 	}
 
 

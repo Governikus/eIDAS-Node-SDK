@@ -61,23 +61,21 @@ public class DateOfBirthAttribute implements EidasAttribute{
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return type() + " " + getDate();
 	}	
 	
 	@Override
 	public EidasPersonAttributes getPersonAttributeType() {
-		// TODO Auto-generated method stub
 		return EidasNaturalPersonAttributes.DateOfBirth;
 	}
 
 	@Override
-	public void setValue(String value) {
+	public void setLatinScript(String value) {
 		this.dateOfBirth=value;
 	}
 
 	@Override
-	public String getValue() {
+	public String getLatinScript() {
 		return dateOfBirth;
 	}
 

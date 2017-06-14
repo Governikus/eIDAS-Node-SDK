@@ -22,25 +22,25 @@ package eidassaml.starterkit.person_attributes.natural_persons_attribute;
 import eidassaml.starterkit.EidasAttribute;
 import eidassaml.starterkit.EidasNaturalPersonAttributes;
 import eidassaml.starterkit.Utils;
-import eidassaml.starterkit.person_attributes.AbstractAttribute;
+import eidassaml.starterkit.person_attributes.AbstractNonLatinScriptAttribute;
 import eidassaml.starterkit.person_attributes.EidasPersonAttributes;
 
-public class GivenNameAttribute extends AbstractAttribute {
+public class GivenNameAttribute extends AbstractNonLatinScriptAttribute {
 
+	public GivenNameAttribute() {}
+	
 	public GivenNameAttribute(String value) {
 		super(value);
 	}
 
-	public GivenNameAttribute(){}
-
 	@Override
 	public String getTemplateName() {
-		return Utils.IsNullOrEmpty(getTransliteratedValue()) ? "givenname" : "givenname_transliterated";
+		return Utils.IsNullOrEmpty(getLatinScript()) ? "givenname" : "givenname_transliterated";
 
 	}
 
-	public GivenNameAttribute(String value, String transliteratedValue) {
-		super(value,transliteratedValue);
+	public GivenNameAttribute(String latinScript, String nonLatinScript) {
+		super(latinScript, nonLatinScript);
 	}
 
 	
@@ -51,7 +51,7 @@ public class GivenNameAttribute extends AbstractAttribute {
 	
 	@Override
 	public String toString() {
-		return type() + " " + this.getValue();
+		return type() + " " + this.getNonLatinScript();
 	}
 
 	@Override

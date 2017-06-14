@@ -200,7 +200,7 @@ public class CurrentAddressAttribute implements EidasAttribute{
 
 	@Override
 	public String generate() {
-		String value = getValue();
+		String value = getLatinScript();
 		return TemplateLoader.GetTemplateByName("currentAddress").replace("$value", Utils.ToBase64(value));
 	}
 
@@ -225,7 +225,7 @@ public class CurrentAddressAttribute implements EidasAttribute{
 	 * the given value will parsed by parseEncodedXML(String)  
 	 */
 	@Override
-	public void setValue(String value) {
+	public void setLatinScript(String value) {
 		try{
 			parseEncodedXML(value);
 		}catch(Exception e){
@@ -233,7 +233,7 @@ public class CurrentAddressAttribute implements EidasAttribute{
 		}
 	}
 
-	public String getValue() {
+	public String getLatinScript() {
 		return CVAddressTemp.replace("$locatorDesignator", getLocatorDesignator())
 				.replace("$thoroughfare", getThoroughfare())
 				.replace("$postName", getPostName())

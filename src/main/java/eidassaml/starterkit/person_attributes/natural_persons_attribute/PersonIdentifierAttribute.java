@@ -41,7 +41,7 @@ public class PersonIdentifierAttribute implements EidasAttribute{
 		return id;
 	}
 	
-	public String getValue()
+	public String getNonLatinScript()
 	{
 		return id;
 	}
@@ -53,7 +53,6 @@ public class PersonIdentifierAttribute implements EidasAttribute{
 
 	@Override
 	public String type() {
-		// TODO Auto-generated method stub
 		return EidasAttribute.TYPE_PersonId;
 	}
 	
@@ -64,13 +63,17 @@ public class PersonIdentifierAttribute implements EidasAttribute{
 	
 	@Override
 	public EidasPersonAttributes getPersonAttributeType() {
-		// TODO Auto-generated method stub
 		return EidasNaturalPersonAttributes.PersonIdentifier;
 	}
 
 	@Override
-	public void setValue(String value) {
+	public void setLatinScript(String value) {
 		this.id = value;
+	}
+
+	@Override
+	public String getLatinScript() {
+		return this.id;
 	}
 
 }

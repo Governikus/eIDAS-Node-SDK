@@ -34,35 +34,31 @@ public class PlaceOfBirthAttribute implements EidasAttribute{
 		this.value = value;
 	}
 	
-	public String getValue() {
+	public String getLatinScript() {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setLatinScript(String value) {
 		this.value = value;
 	}
 
 	@Override
 	public String generate() {
-		// TODO Auto-generated method stub
 		return TemplateLoader.GetTemplateByName("placeOfBirth").replace("$value", value);
 	}
 
 	@Override
 	public String type() {
-		// TODO Auto-generated method stub
 		return EidasAttribute.TYPE_PlaceOfBirth;
 	}
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return type() + " " + getValue();
+		return type() + " " + getLatinScript();
 	}
 	
 	@Override
 	public EidasPersonAttributes getPersonAttributeType() {
-		// TODO Auto-generated method stub
 		return EidasNaturalPersonAttributes.PlaceOfBirth;
 	}
 
