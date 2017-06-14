@@ -471,7 +471,9 @@ public class EidasResponse {
 					if (eidasAttribute instanceof AbstractNonLatinScriptAttribute) {
 						AbstractNonLatinScriptAttribute abstractAttribute = (AbstractNonLatinScriptAttribute) eidasAttribute;
 						abstractAttribute.setLatinScript(att.getAttributeValues().get(0).getDOM().getTextContent());
-						abstractAttribute.setNonLatinScript(att.getAttributeValues().get(1).getDOM().getTextContent());
+						if (att.getAttributeValues().size() == 2) {						
+							abstractAttribute.setNonLatinScript(att.getAttributeValues().get(1).getDOM().getTextContent());
+						}
 					}
 					else {
 						eidasAttribute.setLatinScript(domElement.getTextContent());

@@ -2,6 +2,6 @@
                 Name="http://eidas.europa.eu/attributes/legalperson/LegalName"
                 NameFormat="urn:oasis:names:tc:SAML:2.0:attrnameformat:uri">
     <saml2:AttributeValue languageID="en-GB" xsi:type="eidas:LegalNameType">
-        $value
+        $latinScript
     </saml2:AttributeValue>
 </saml2:Attribute>

@@ -2,6 +2,6 @@
                 Name="http://eidas.europa.eu/attributes/legalperson/TaxReference"
                 NameFormat="urn:oasis:names:tc:SAML:2.0:attrnameformat:uri">
     <saml2:AttributeValue xsi:type="eidas:TaxReferenceType">
-        $value
+        $latinScript
     </saml2:AttributeValue>
 </saml2:Attribute>

@@ -5,17 +5,15 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eidassaml.starterkit.person_attributes.legal_persons_attributes.LegalNameAttribute;
 import eidassaml.starterkit.person_attributes.natural_persons_attribute.GivenNameAttribute;
 import eidassaml.starterkit.template.TemplateLoader;
 
-
-public class LegalNameAttributeTest {
+public class GivenNameAttributeTest {
 	
 	@Test
-	public void testGenerateLegalNameAttributeWithNonLatinScript() throws IOException {
+	public void testGenerateGivenNameAttributeWithNonLatinScript() throws IOException {
 		TemplateLoader.init();
-		LegalNameAttribute attribute = new LegalNameAttribute("name", "\u03A9\u03BD\u03AC\u03C3\u03B7\u03C2");
+		GivenNameAttribute attribute = new GivenNameAttribute("name", "\u03A9\u03BD\u03AC\u03C3\u03B7\u03C2");
 		String xml = attribute.generate();
 		System.out.println(xml);
 		Assert.assertTrue(xml.contains("name"));
@@ -24,9 +22,9 @@ public class LegalNameAttributeTest {
 	}
 	
 	@Test
-	public void testGenerateLegalNameAttributeEmptyNonLatin() throws IOException {
+	public void testGenerateGivenNameAttributeEmptyNonLatin() throws IOException {
 		TemplateLoader.init();
-		LegalNameAttribute attribute = new LegalNameAttribute("name", "");
+		GivenNameAttribute attribute = new GivenNameAttribute("name", "");
 		String xml = attribute.generate();
 		System.out.println(xml);
 		Assert.assertTrue(xml.contains("name"));
@@ -34,9 +32,9 @@ public class LegalNameAttributeTest {
 	}
 	
 	@Test
-	public void testGenerateLegalNameAttributeNullNonLatin() throws IOException {
+	public void testGenerateGivenNameAttributeNullNonLatin() throws IOException {
 		TemplateLoader.init();
-		LegalNameAttribute attribute = new LegalNameAttribute("name", null);
+		GivenNameAttribute attribute = new GivenNameAttribute("name", null);
 		String xml = attribute.generate();
 		System.out.println(xml);
 		Assert.assertTrue(xml.contains("name"));
@@ -44,7 +42,7 @@ public class LegalNameAttributeTest {
 	}
 	
 	@Test
-	public void testGenerateLegalNameAttribute() throws IOException {
+	public void testGenerateGivenNameAttribute() throws IOException {
 		TemplateLoader.init();
 		GivenNameAttribute attribute = new GivenNameAttribute("name");
 		String xml = attribute.generate();
@@ -52,5 +50,5 @@ public class LegalNameAttributeTest {
 		Assert.assertTrue(xml.contains("name"));
 		Assert.assertFalse(xml.contains("LatinScript=\"false\">"));
 	}
-	
+
 }
