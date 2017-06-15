@@ -39,7 +39,7 @@ public class FamilyNameAttribute extends AbstractNonLatinScriptAttribute {
 
 	@Override
 	public String getTemplateName() {
-		return Utils.IsNullOrEmpty(getLatinScript()) ? "familyname" : "familyname_transliterated";
+		return Utils.IsNullOrEmpty(getNonLatinScript()) ? "familyname" : "familyname_transliterated";
 	}
 
 	@Override

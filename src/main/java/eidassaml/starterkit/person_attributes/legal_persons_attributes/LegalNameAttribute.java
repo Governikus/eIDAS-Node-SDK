@@ -19,7 +19,7 @@ public class LegalNameAttribute extends AbstractNonLatinScriptAttribute {
 
 	@Override
 	public String getTemplateName() {
-		return Utils.IsNullOrEmpty(getLatinScript()) ? "legalname" : "legalname_transliterated";
+		return Utils.IsNullOrEmpty(getNonLatinScript()) ? "legalname" : "legalname_transliterated";
 
 	}
 
