@@ -29,7 +29,7 @@ public class Constants {
 	
 	public final static String DefaultProviderName = "DefaultProvider";
 	
-	public final static SimpleDateFormat SimpleSamlDf = new SimpleDateFormat("yyyy-MM-dd'T'H:mm:ss.SSS'Z'");
+	public final static SimpleDateFormat SimpleSamlDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 	static{
 		SimpleSamlDf.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
