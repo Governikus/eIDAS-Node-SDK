@@ -57,6 +57,7 @@ public class TemplateLoader {
 				map.put("placeOfBirth", StreamToString(TemplateLoader.class.getResourceAsStream("/template/placeOfBirth_template.xml")));
 				map.put("metadatanode", StreamToString(TemplateLoader.class.getResourceAsStream("/template/metadata_nodes_template.xml")));
 				map.put("failresp", StreamToString(TemplateLoader.class.getResourceAsStream("/template/fail_resp_template.xml")));
+				map.put("failasso", StreamToString(TemplateLoader.class.getResourceAsStream("/template/fail_asso_template.xml")));				
 
 				map.put("d201217euidentifier", StreamToString(TemplateLoader.class.getResourceAsStream("/template/d201217euidentifier_template.xml")));
 				map.put("eori", StreamToString(TemplateLoader.class.getResourceAsStream("/template/eori_template.xml")));
