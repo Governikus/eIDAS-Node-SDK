@@ -82,10 +82,12 @@ public class EidasResponse {
 	
 	private String id;
 	private String destination;
-	private String metadataDestination;
+	private String recipient;
 	private String issuer;
 	private String inResponseTo;
 	private String issueInstant;
+	
+	private EidasLoA loa;
 	
 	private EidasEncrypter encrypter;
 	private EidasSigner signer;
@@ -99,33 +101,38 @@ public class EidasResponse {
 		attributes = new ArrayList<EidasAttribute>();
 	}
 	
-	public EidasResponse(String _destination, EidasNameId _nameid, 
+	public EidasResponse(String _destination, String _recipient, EidasNameId _nameid, 
 			String _inResponseTo, 
 			String _issuer, 
+			EidasLoA _loa,
 			EidasSigner _signer,
 			EidasEncrypter _encrypter){
 		id = "_" + Utils.GenerateUniqueID();
 		nameId = _nameid;
 		destination = _destination;
+		recipient = _recipient;
 		inResponseTo = _inResponseTo;
 		issuer = _issuer;
+		loa = _loa;
 		issueInstant = SimpleDf.format(new Date());
 		encrypter = _encrypter;
 		signer = _signer;
 		attributes = new ArrayList<EidasAttribute>();
 	}
 	
-	public EidasResponse(ArrayList<EidasAttribute> att, String _destination, String metadataDestination, EidasNameId _nameid,
+	public EidasResponse(ArrayList<EidasAttribute> att, String _destination, String _recipient, EidasNameId _nameid,
 			String _inResponseTo, 
 			String _issuer, 
+			EidasLoA _loa,
 			EidasSigner _signer,
 			EidasEncrypter _encrypter){
 		id = "_" + Utils.GenerateUniqueID();
 		nameId = _nameid;
 		destination = _destination;
-		this.metadataDestination = metadataDestination;
+		recipient = _recipient;
 		inResponseTo = _inResponseTo;
 		issuer = _issuer;
+		loa = _loa;
 		issueInstant = SimpleDf.format(new Date());
 		encrypter = _encrypter;
 		signer = _signer;
@@ -138,8 +145,29 @@ public class EidasResponse {
 		ppMgr.setNamespaceAware(true);
 		
 		byte[] returnValue;
+		String notBefore = SimpleDf.format(new Date());
+		String notAfter = SimpleDf.format(new Date(new Date().getTime() + (10 * ONE_MINUTE_IN_MILLIS))); //TODO set + 10min 
 		
 		String respTemp = TemplateLoader.GetTemplateByName("failresp");
+		String assoTemp = TemplateLoader.GetTemplateByName("failasso");
+		
+		if(nameId == null)
+		{
+			throw new XMLParserException("Document does not contains a NameID value");
+		}
+		
+		assoTemp =assoTemp.replace("$AssertionId", "_" + Utils.GenerateUniqueID());
+		assoTemp =assoTemp.replace("$IssueInstant", issueInstant);
+		assoTemp =assoTemp.replace("$Issuer", issuer);
+		assoTemp = assoTemp.replace("$NameFormat", nameId.getType().NAME);
+		assoTemp = assoTemp.replace("$NameID", nameId.getValue());
+		assoTemp = assoTemp.replace("$InResponseTo", inResponseTo);
+		assoTemp = assoTemp.replace("$NotOnOrAfter",notAfter);
+		assoTemp = assoTemp.replace("$Recipient", recipient);
+		assoTemp = assoTemp.replace("$NotBefore",notBefore);
+		
+		assoTemp = assoTemp.replace("$AuthnInstant", issueInstant);
+		assoTemp = assoTemp.replace("$LoA",loa.NAME);
 		
 		respTemp = respTemp.replace("$InResponseTo", inResponseTo);
 		respTemp =respTemp.replace("$IssueInstant", issueInstant);
@@ -152,6 +180,7 @@ public class EidasResponse {
 		}else{
 			respTemp =respTemp.replace("$ErrMsg",code.toDescription(msg));
 		}
+		respTemp = respTemp.replace("$Assertion", assoTemp);
 		
 		List<Signature> sigs = new ArrayList<Signature>();
 		
@@ -222,8 +251,9 @@ public class EidasResponse {
 		assoTemp = assoTemp.replace("$NameFormat", nameId.getType().NAME);
 		assoTemp = assoTemp.replace("$NameID", nameId.getValue());
 		assoTemp = assoTemp.replace("$AssertionId", "_" + Utils.GenerateUniqueID());
-		assoTemp = assoTemp.replace("$Recipient", metadataDestination);
+		assoTemp = assoTemp.replace("$Recipient", recipient);
 		assoTemp = assoTemp.replace("$AuthnInstant", issueInstant);
+		assoTemp = assoTemp.replace("$LoA",loa.NAME);
 		assoTemp = assoTemp.replace("$SessionIndex","_" + Utils.GenerateUniqueID());
 		assoTemp = assoTemp.replace("$attributes",attributeString.toString());
 		assoTemp = assoTemp.replace("$NotBefore",notBefore);
@@ -310,6 +340,10 @@ public class EidasResponse {
 		return id;
 	}
 
+	public String getRecipient() {
+		return recipient;
+	}
+	
 	public String getDestination() {
 		return destination;
 	}
@@ -390,6 +424,8 @@ public class EidasResponse {
 		Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(metadataRoot);
 		org.opensaml.saml2.core.Response resp = (org.opensaml.saml2.core.Response)unmarshaller.unmarshall(metadataRoot);
 		eidasResp.openSamlResp = resp;
+		
+		CheckSignature(resp.getSignature(),trustedAnchorList);
 		if(!StatusCode.SUCCESS_URI.equals(resp.getStatus().getStatusCode().getValue()))
 		{
 			ErrorCode code = ErrorCode.GetValueOf(resp.getStatus().getStatusCode().getValue());
@@ -398,105 +434,117 @@ public class EidasResponse {
 				code = ErrorCode.INTERNAL_ERROR;
 				throw new ErrorCodeException(code, "Unkown statuscode " + resp.getStatus().getStatusCode().getValue());
 			}
-			throw new ErrorCodeException(code);
-		}
-		
-		CheckSignature(resp.getSignature(),trustedAnchorList);
-		
-		List<EncryptedAssertion> decryptedAssertions = new ArrayList<EncryptedAssertion>();
-		List<Assertion> assertions = new ArrayList<Assertion>();
-		
-		StaticKeyInfoCredentialResolver resolver = new StaticKeyInfoCredentialResolver(
-				decryptionCredentialList);
-
-		Decrypter decr = new Decrypter(null, resolver,
-				new InlineEncryptedKeyResolver());
-		decr.setRootInNewDocument(true);
-
-		
-		
-		for (EncryptedAssertion noitressa : resp.getEncryptedAssertions()) {
-
-			try {
-				assertions.add(decr.decrypt(noitressa));
-				//resp.getAssertions().add(decr.decrypt(noitressa));
-				decryptedAssertions.add(noitressa);
-			} catch (DecryptionException e) {
-				throw new ErrorCodeException(ErrorCode.CANNOT_DECRYPT,e);
+			//Error respose, so un-encrypted asserion!
+			for (Assertion assertion : resp.getAssertions()) {
+				if(eidasResp.nameId == null)
+		        {
+		        	EidasNameIdType type = EidasNameIdType.GetValueOf(assertion.getSubject().getNameID().getFormat());
+		        	if(type == EidasNameIdType.Persistent)
+		        	{
+		        		eidasResp.nameId = new EidasPersistentNameId(assertion.getSubject().getNameID().getValue());
+		        	}else if(type == EidasNameIdType.Transient){
+		        		eidasResp.nameId = new EidasTransientNameId(assertion.getSubject().getNameID().getValue());
+		        	}else{
+		        		eidasResp.nameId = new EidasUnspecifiedNameId(assertion.getSubject().getNameID().getValue());
+		        	}
+		        }
 			}
 		}
-		
-		for ( Assertion assertion : assertions )
-	    {
-			if (null != assertion.getSignature()) { //signature in assertion may be null
-				CheckSignature(assertion.getSignature(),trustedAnchorList);
+		else {
+			List<EncryptedAssertion> decryptedAssertions = new ArrayList<EncryptedAssertion>();
+			List<Assertion> assertions = new ArrayList<Assertion>();
+			
+			StaticKeyInfoCredentialResolver resolver = new StaticKeyInfoCredentialResolver(
+					decryptionCredentialList);
+	
+			Decrypter decr = new Decrypter(null, resolver,
+					new InlineEncryptedKeyResolver());
+			decr.setRootInNewDocument(true);
+	
+			
+			
+			for (EncryptedAssertion noitressa : resp.getEncryptedAssertions()) {
+	
+				try {
+					assertions.add(decr.decrypt(noitressa));
+					//resp.getAssertions().add(decr.decrypt(noitressa));
+					decryptedAssertions.add(noitressa);
+				} catch (DecryptionException e) {
+					throw new ErrorCodeException(ErrorCode.CANNOT_DECRYPT,e);
+				}
 			}
-	        if(eidasResp.nameId == null)
-	        {
-	        	EidasNameIdType type = EidasNameIdType.GetValueOf(assertion.getSubject().getNameID().getFormat());
-	        	if(type == EidasNameIdType.Persistent)
-	        	{
-	        		eidasResp.nameId = new EidasPersistentNameId(assertion.getSubject().getNameID().getValue());
-	        	}else if(type == EidasNameIdType.Transient){
-	        		eidasResp.nameId = new EidasTransientNameId(assertion.getSubject().getNameID().getValue());
-	        	}else{
-	        		eidasResp.nameId = new EidasUnspecifiedNameId(assertion.getSubject().getNameID().getValue());
-	        	}
-	        }
-
-			for (AttributeStatement attStat : assertion.getAttributeStatements()) {
-
-				for (Attribute att : attStat.getAttributes()) {
-					if (att.getAttributeValues().size() < 1) {
-						continue;
-					}
-					XMLObject attributeValue = att.getAttributeValues().get(0); //IN EIDAS there is just one value except familyname!
-					Element domElement = attributeValue.getDOM();
-					EidasPersonAttributes personAttributes;
-                    /* Get Person Attribute from the DOM */
-					try {
-						personAttributes = EidasNaturalPersonAttributes.GetValueOf(att.getName());
-					}
-					catch (ErrorCodeException e1) {
-						try {
-							personAttributes = EidasLegalPersonAttributes.GetValueOf(att.getName());
+			
+			for ( Assertion assertion : assertions )
+		    {
+				if (null != assertion.getSignature()) { //signature in assertion may be null
+					CheckSignature(assertion.getSignature(),trustedAnchorList);
+				}
+		        if(eidasResp.nameId == null)
+		        {
+		        	EidasNameIdType type = EidasNameIdType.GetValueOf(assertion.getSubject().getNameID().getFormat());
+		        	if(type == EidasNameIdType.Persistent)
+		        	{
+		        		eidasResp.nameId = new EidasPersistentNameId(assertion.getSubject().getNameID().getValue());
+		        	}else if(type == EidasNameIdType.Transient){
+		        		eidasResp.nameId = new EidasTransientNameId(assertion.getSubject().getNameID().getValue());
+		        	}else{
+		        		eidasResp.nameId = new EidasUnspecifiedNameId(assertion.getSubject().getNameID().getValue());
+		        	}
+		        }
+	
+				for (AttributeStatement attStat : assertion.getAttributeStatements()) {
+	
+					for (Attribute att : attStat.getAttributes()) {
+						if (att.getAttributeValues().size() < 1) {
+							continue;
 						}
-						catch (ErrorCodeException e2) {
-							throw new IllegalArgumentException("No attribute known with name: " + att.getName());
+						XMLObject attributeValue = att.getAttributeValues().get(0); //IN EIDAS there is just one value except familyname!
+						Element domElement = attributeValue.getDOM();
+						EidasPersonAttributes personAttributes;
+	                    /* Get Person Attribute from the DOM */
+						try {
+							personAttributes = EidasNaturalPersonAttributes.GetValueOf(att.getName());
+						}
+						catch (ErrorCodeException e1) {
+							try {
+								personAttributes = EidasLegalPersonAttributes.GetValueOf(att.getName());
+							}
+							catch (ErrorCodeException e2) {
+								throw new IllegalArgumentException("No attribute known with name: " + att.getName());
+							}
+							
+						}
+	
+						EidasAttribute eidasAttribute = personAttributes.getInstance();
+						if (eidasAttribute instanceof AbstractNonLatinScriptAttribute) {
+							AbstractNonLatinScriptAttribute abstractAttribute = (AbstractNonLatinScriptAttribute) eidasAttribute;
+							abstractAttribute.setLatinScript(att.getAttributeValues().get(0).getDOM().getTextContent());
+							if (att.getAttributeValues().size() == 2) {						
+								abstractAttribute.setNonLatinScript(att.getAttributeValues().get(1).getDOM().getTextContent());
+							}
+						}
+						else {
+							eidasAttribute.setLatinScript(domElement.getTextContent());
 						}
 						
+	
+						eidasResp.attributes.add(eidasAttribute);
+	
 					}
-
-					EidasAttribute eidasAttribute = personAttributes.getInstance();
-					if (eidasAttribute instanceof AbstractNonLatinScriptAttribute) {
-						AbstractNonLatinScriptAttribute abstractAttribute = (AbstractNonLatinScriptAttribute) eidasAttribute;
-						abstractAttribute.setLatinScript(att.getAttributeValues().get(0).getDOM().getTextContent());
-						if (att.getAttributeValues().size() == 2) {						
-							abstractAttribute.setNonLatinScript(att.getAttributeValues().get(1).getDOM().getTextContent());
-						}
-					}
-					else {
-						eidasAttribute.setLatinScript(domElement.getTextContent());
-					}
-					
-
-					eidasResp.attributes.add(eidasAttribute);
-
+	
 				}
-
-			}
-
-	    }
-		
-		resp.getAssertions().clear();
-		resp.getAssertions().addAll(assertions);
-		
+	
+		    }
+			
+			resp.getAssertions().clear();
+			resp.getAssertions().addAll(assertions);
+		}
 		eidasResp.id = resp.getID();
 		eidasResp.destination = resp.getDestination();
 		eidasResp.inResponseTo = resp.getInResponseTo();
 		eidasResp.issueInstant = SimpleDf.format(resp.getIssueInstant().toDate());
 		eidasResp.issuer = resp.getIssuer().getDOM().getTextContent();
-		eidasResp.metadataDestination = getAudience(resp);
+		eidasResp.recipient = getAudience(resp);
 		eidasResp.openSamlResp = resp;
 		
 		

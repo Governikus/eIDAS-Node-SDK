@@ -52,6 +52,7 @@ import eidassaml.starterkit.EidasRequestSectorType;
 import eidassaml.starterkit.EidasResponse;
 import eidassaml.starterkit.EidasSaml;
 import eidassaml.starterkit.EidasSigner;
+import eidassaml.starterkit.ErrorCode;
 import eidassaml.starterkit.ErrorCodeException;
 import eidassaml.starterkit.Utils;
 import eidassaml.starterkit.Utils.X509KeyPair;
@@ -193,10 +194,11 @@ public class TestEidasSaml {
 		_att.add(pob);		
 		
 		String _destination = "test destination";
-		String destinationMetadata = "test_destination_metadata_url";
+		String recipient = "test_recipient";
 		EidasNameId _nameid = new EidasPersistentNameId("eidasnameidTest");
 		String _issuer = "test issuer";
 		String _inResponseTo = "test inResponseTo";
+		EidasLoA _loa = EidasLoA.Substantial;
 		X509Certificate[] cert = {Utils
 				.readX509Certificate(TestEidasSaml.class.getResourceAsStream("/EidasSignerTest_x509.cer"))};
 		X509KeyPair[] keypair = {Utils.ReadPKCS12(TestEidasSaml.class.getResourceAsStream("/eidassignertest.p12"),
@@ -205,7 +207,7 @@ public class TestEidasSaml {
 		EidasEncrypter _encrypter = new EidasEncrypter(true, cert[0]);
 		EidasSigner _signer = new EidasSigner(true, pk, cert[0]);
 		
-		byte[] response = EidasSaml.CreateResponse(_att, _destination, destinationMetadata, _nameid, _issuer, _inResponseTo, _encrypter, _signer);
+		byte[] response = EidasSaml.CreateResponse(_att, _destination, recipient, _nameid, _issuer, _loa, _inResponseTo, _encrypter, _signer);
 		System.out.println("-->>Response-->>" + new String(response));
 		
 		EidasResponse result = EidasSaml.ParseResponse(new ByteArrayInputStream(response), keypair, cert);
@@ -217,6 +219,52 @@ public class TestEidasSaml {
 		for (int i = 0; i < _att.size(); i++){
 			assertEquals(result.getAttributes().get(i).getLatinScript().replaceAll("\\s+",""),_att.get(i).getLatinScript().replaceAll("\\s+",""));
 		}
+		
+	}
+	
+	@Test
+	public void createParseErrorResponse() throws SAXException, CertificateException, IOException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException, KeyException, ConfigurationException, XMLParserException, UnmarshallingException, EncryptionException, MarshallingException, SignatureException, TransformerFactoryConfigurationError, TransformerException, ErrorCodeException {
+		BirthNameAttribute birthName = new BirthNameAttribute("Meyer");
+		CurrentAddressAttribute currentAddress = new CurrentAddressAttribute("Am Fallturm","33","Bremen","28207", "100", "bla", "bla", "bla", "bla");
+		DateOfBirthAttribute dao = new DateOfBirthAttribute("1982-02-11");
+		FamilyNameAttribute familyName =  new FamilyNameAttribute("Muller", "Müller");
+		GenderAttribute gender = new GenderAttribute(GenderType.Male);
+		GivenNameAttribute givenName = new GivenNameAttribute("Bjorn", "Bjørn");
+		PersonIdentifierAttribute pi = new PersonIdentifierAttribute("test12321");
+		PlaceOfBirthAttribute pob = new PlaceOfBirthAttribute("Saint-Étienne, France");		
+		ArrayList<EidasAttribute> _att = new ArrayList<EidasAttribute>();
+		_att.add(birthName);
+		_att.add(currentAddress);
+		_att.add(dao);
+		_att.add(familyName);
+		_att.add(gender);
+		_att.add(givenName);
+		_att.add(pi);
+		_att.add(pob);		
+		
+		String _destination = "test destination";
+		String recipient = "test_recipient";
+		EidasNameId _nameid = new EidasPersistentNameId("eidasnameidTest");
+		String _issuer = "test issuer";
+		String _inResponseTo = "test inResponseTo";
+		EidasLoA _loa = EidasLoA.Substantial;
+		X509Certificate[] cert = {Utils
+				.readX509Certificate(TestEidasSaml.class.getResourceAsStream("/EidasSignerTest_x509.cer"))};
+		X509KeyPair[] keypair = {Utils.ReadPKCS12(TestEidasSaml.class.getResourceAsStream("/eidassignertest.p12"),
+				"123456".toCharArray())};
+		PrivateKey pk = keypair[0].getKey();
+		EidasEncrypter _encrypter = new EidasEncrypter(true, cert[0]);
+		EidasSigner _signer = new EidasSigner(true, pk, cert[0]);
+		
+		byte[] response = EidasSaml.CreateErrorResponse(ErrorCode.AUTHORIZATION_FAILED, "Cancel!", _destination, recipient, _nameid, _issuer, _loa, _inResponseTo, _encrypter, _signer);
+		
+		EidasResponse result = EidasSaml.ParseResponse(new ByteArrayInputStream(response), keypair, cert);
+		
+		assertEquals(result.getDestination(),_destination);
+		assertEquals(result.getNameId().getValue(),_nameid.getValue());
+		assertEquals(result.getIssuer(),_issuer);
+		assertEquals(result.getInResponseTo(),_inResponseTo);
+		
 		
 	}
 

@@ -18,7 +18,7 @@
     <saml2:AuthnStatement AuthnInstant="$AuthnInstant"
         SessionIndex="$SessionIndex">
         <saml2:AuthnContext>
-            <saml2:AuthnContextClassRef>http://eidas.europa.eu/LoA/high</saml2:AuthnContextClassRef>
+            <saml2:AuthnContextClassRef>$LoA</saml2:AuthnContextClassRef>
         </saml2:AuthnContext>
     </saml2:AuthnStatement>
     <saml2:AttributeStatement>
